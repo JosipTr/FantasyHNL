@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../util/enums/enum.dart';
-import '../../bloc/register_cubit/register_cubit.dart';
+import '../../bloc/auth_form_cubit/auth_form_cubit.dart';
 import '../../pages/login_page.dart';
 
 class RegisterForm extends StatelessWidget {
@@ -11,14 +11,14 @@ class RegisterForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<RegisterCubit, RegisterState>(
+    return BlocListener<AuthFormCubit, AuthFormState>(
       listener: (context, state) {
         if (state.status == Status.failure) {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage),
+                content: Text(state.errorMessage ?? 'Authentication Failed'),
               ),
             );
         }
@@ -56,13 +56,13 @@ class RegisterForm extends StatelessWidget {
 class _EmailInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegisterCubit, RegisterState>(
+    return BlocBuilder<AuthFormCubit, AuthFormState>(
       buildWhen: (previous, current) => previous.email != current.email,
       builder: (context, state) {
         return TextField(
           key: const Key('loginForm_emailInput_textField'),
           onChanged: (email) =>
-              context.read<RegisterCubit>().emailChanged(email),
+              context.read<AuthFormCubit>().emailChanged(email),
           keyboardType: TextInputType.emailAddress,
           decoration: InputDecoration(
               labelText: 'email',
@@ -78,13 +78,13 @@ class _EmailInput extends StatelessWidget {
 class _PasswordInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegisterCubit, RegisterState>(
+    return BlocBuilder<AuthFormCubit, AuthFormState>(
       buildWhen: (previous, current) => previous.password != current.password,
       builder: (context, state) {
         return TextField(
           key: const Key('loginForm_passwordInput_textField'),
           onChanged: (password) =>
-              context.read<RegisterCubit>().passwordChanged(password),
+              context.read<AuthFormCubit>().passwordChanged(password),
           obscureText: true,
           decoration: InputDecoration(
             labelText: 'Password',
@@ -100,19 +100,20 @@ class _PasswordInput extends StatelessWidget {
 class _ConfirmPasswordInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegisterCubit, RegisterState>(
+    return BlocBuilder<AuthFormCubit, AuthFormState>(
       buildWhen: (previous, current) =>
           previous.confirmPassword != current.confirmPassword,
       builder: (context, state) {
         return TextField(
           key: const Key('loginForm_confirmPassword_textField'),
           onChanged: (password) =>
-              context.read<RegisterCubit>().confirmPasswordChanged(password),
+              context.read<AuthFormCubit>().confirmPasswordChanged(password),
           obscureText: true,
           decoration: InputDecoration(
             labelText: 'Confirm password:',
             helperText: '',
-            errorText: state.confirmPassword.displayError(state.password.value),
+            errorText:
+                state.confirmPassword!.displayError(state.password.value),
           ),
         );
       },
@@ -123,7 +124,7 @@ class _ConfirmPasswordInput extends StatelessWidget {
 class _RegisterButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegisterCubit, RegisterState>(
+    return BlocBuilder<AuthFormCubit, AuthFormState>(
       builder: (context, state) {
         return state.status == Status.inProgress
             ? const CircularProgressIndicator()
@@ -160,7 +161,7 @@ class _GoogleLoginButton extends StatelessWidget {
         backgroundColor: theme.colorScheme.secondary,
       ),
       icon: const Icon(FontAwesomeIcons.google, color: Colors.white),
-      // onPressed: () => context.read<RegisterCubit>().logInWithGoogle(),
+      // onPressed: () => context.read<AuthFormCubit>().logInWithGoogle(),
       onPressed: null,
     );
   }

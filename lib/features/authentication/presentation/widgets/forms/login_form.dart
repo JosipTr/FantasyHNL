@@ -1,24 +1,24 @@
+import 'package:fantasy_hnl/features/authentication/presentation/bloc/auth_form_cubit/auth_form_cubit.dart';
 import 'package:fantasy_hnl/features/authentication/presentation/pages/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../util/enums/enum.dart';
-import '../../bloc/login_cubit/login_cubit.dart';
 
 class LoginForm extends StatelessWidget {
   const LoginForm({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<LoginCubit, LoginState>(
+    return BlocListener<AuthFormCubit, AuthFormState>(
       listener: (context, state) {
         if (state.status == Status.failure) {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage),
+                content: Text(state.errorMessage ?? 'Authentication Failed'),
               ),
             );
         }
@@ -54,12 +54,13 @@ class LoginForm extends StatelessWidget {
 class _EmailInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<LoginCubit, LoginState>(
+    return BlocBuilder<AuthFormCubit, AuthFormState>(
       buildWhen: (previous, current) => previous.email != current.email,
       builder: (context, state) {
         return TextField(
           key: const Key('loginForm_emailInput_textField'),
-          onChanged: (email) => context.read<LoginCubit>().emailChanged(email),
+          onChanged: (email) =>
+              context.read<AuthFormCubit>().emailChanged(email),
           keyboardType: TextInputType.emailAddress,
           decoration: InputDecoration(
               labelText: 'email',
@@ -75,13 +76,13 @@ class _EmailInput extends StatelessWidget {
 class _PasswordInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<LoginCubit, LoginState>(
+    return BlocBuilder<AuthFormCubit, AuthFormState>(
       buildWhen: (previous, current) => previous.password != current.password,
       builder: (context, state) {
         return TextField(
           key: const Key('loginForm_passwordInput_textField'),
           onChanged: (password) =>
-              context.read<LoginCubit>().passwordChanged(password),
+              context.read<AuthFormCubit>().passwordChanged(password),
           obscureText: true,
           decoration: InputDecoration(
             labelText: 'password',
@@ -98,7 +99,7 @@ class _PasswordInput extends StatelessWidget {
 class _LoginButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<LoginCubit, LoginState>(
+    return BlocBuilder<AuthFormCubit, AuthFormState>(
       builder: (context, state) {
         return state.status == Status.inProgress
             ? const CircularProgressIndicator()
@@ -111,7 +112,7 @@ class _LoginButton extends StatelessWidget {
                   backgroundColor: const Color(0xFFFFD600),
                 ),
                 onPressed: state.isValid
-                    ? () => context.read<LoginCubit>().loginWithCredentials()
+                    ? () => context.read<AuthFormCubit>().loginWithCredentials()
                     : null,
                 child: const Text('LOGIN'),
               );
@@ -137,7 +138,7 @@ class _GoogleLoginButton extends StatelessWidget {
         backgroundColor: theme.colorScheme.secondary,
       ),
       icon: const Icon(FontAwesomeIcons.google, color: Colors.white),
-      // onPressed: () => context.read<LoginCubit>().logInWithGoogle(),
+      // onPressed: () => context.read<AuthFormCubit>().logInWithGoogle(),
       onPressed: null,
     );
   }

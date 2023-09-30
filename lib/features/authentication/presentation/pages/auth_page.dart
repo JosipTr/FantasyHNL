@@ -5,9 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../widgets/forms/login_form.dart';
 
-class LoginPage extends StatelessWidget {
+class AuthPage extends StatelessWidget {
   static const String route = "/login_page";
-  const LoginPage({super.key});
+  const AuthPage({super.key});
 
   @override
   Widget build(BuildContext context) {

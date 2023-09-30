@@ -2,6 +2,7 @@ import 'package:fantasy_hnl/features/authentication/domain/usecases/auth_state_c
 import 'package:fantasy_hnl/features/authentication/domain/usecases/login_email_password.dart';
 import 'package:fantasy_hnl/features/authentication/domain/usecases/logout.dart';
 import 'package:fantasy_hnl/features/authentication/domain/usecases/register.dart';
+import 'package:fantasy_hnl/features/authentication/presentation/bloc/auth_form_cubit/auth_form_cubit.dart';
 import 'package:fantasy_hnl/features/authentication/presentation/bloc/register_cubit/register_cubit.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
@@ -31,8 +32,6 @@ Future<void> initializeAuthDependencies() async {
   authInjector.registerLazySingleton(() => Logout(authInjector()));
   authInjector.registerLazySingleton(() => AuthStateChanges(authInjector()));
   authInjector.registerLazySingleton(() => Register(authInjector()));
-  // authInjector.registerLazySingleton(
-  //     () => RegisterUserWithEmailAndPassword(authInjector()));
   authInjector
       .registerLazySingleton(() => LoginWithEmailAndPassword(authInjector()));
 
@@ -42,6 +41,8 @@ Future<void> initializeAuthDependencies() async {
   // //Cubit
   authInjector.registerFactory(() => LoginCubit(authInjector()));
   authInjector.registerFactory(() => RegisterCubit(authInjector()));
+  authInjector
+      .registerFactory(() => AuthFormCubit(authInjector(), authInjector()));
   //Core
   // authInjector.registerLazySingleton<NetworkInfo>(
   //     () => NetworkInfoImpl(authInjector()));
