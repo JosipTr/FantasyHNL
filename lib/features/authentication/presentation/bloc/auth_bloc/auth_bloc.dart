@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:equatable/equatable.dart';
 import 'package:bloc/bloc.dart';
 import 'package:fantasy_hnl/core/usecases/usecase.dart';
@@ -23,6 +25,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final stream = _authStateChanges();
     await emit.forEach(stream,
         onData: (user) {
+          log(user.toString());
           if (user == null) {
             return const AuthFailure();
           } else {

@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:fantasy_hnl/core/errors/exception.dart';
-import 'package:firebase_auth/firebase_auth.dart' hide User;
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../util/parameters/auth_params.dart';
 import '../models/user_model.dart';
@@ -9,7 +9,6 @@ import '../models/user_model.dart';
 abstract interface class RemoteDataSource {
   Stream<UserModel?> authStateChanges();
   Future<void> loginWithEmailAndPassword(AuthParams params);
-
   Future<void> register(AuthParams params);
   Future<void> logout();
 }
@@ -25,7 +24,7 @@ class FirebaseAuthentication implements RemoteDataSource {
       if (user == null) {
         return null;
       }
-      return UserModel(username: user.displayName!, email: user.email!);
+      return UserModel(username: user.displayName ?? '', email: user.email!);
     });
   }
 
