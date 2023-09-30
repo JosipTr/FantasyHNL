@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "508724561101",
+    "project_id": "fantasy-hnl-b0708",
+    "storage_bucket": "fantasy-hnl-b0708.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:508724561101:android:7885f3791651c1cd0dd584",
+        "android_client_info": {
+          "package_name": "com.example.fantasy_hnl"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUqSgYDKXJtxB-k0i35CdMg_cLVfOpAAs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

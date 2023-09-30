@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyC6ZhMczborhhhoX762Cmkvi7KcqdrbE8A</string>
+	<key>GCM_SENDER_ID</key>
+	<string>508724561101</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.fantasyHnl</string>
+	<key>PROJECT_ID</key>
+	<string>fantasy-hnl-b0708</string>
+	<key>STORAGE_BUCKET</key>
+	<string>fantasy-hnl-b0708.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:508724561101:ios:73956572dd5f77ef0dd584</string>
+</dict>
+</plist>
