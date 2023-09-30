@@ -3,14 +3,13 @@ import 'package:fantasy_hnl/features/authentication/domain/usecases/login_email_
 import 'package:fantasy_hnl/features/authentication/domain/usecases/logout.dart';
 import 'package:fantasy_hnl/features/authentication/domain/usecases/register.dart';
 import 'package:fantasy_hnl/features/authentication/presentation/bloc/auth_form_cubit/auth_form_cubit.dart';
-import 'package:fantasy_hnl/features/authentication/presentation/bloc/register_cubit/register_cubit.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import '../data/datasources/remote_datasource.dart';
 import '../data/repositories/auth_repository_impl.dart';
 import '../domain/repositories/auth_repository.dart';
 import '../presentation/bloc/auth_bloc/auth_bloc.dart';
-import '../presentation/bloc/login_cubit/login_cubit.dart';
 
 final authInjector = GetIt.instance;
 
@@ -39,8 +38,6 @@ Future<void> initializeAuthDependencies() async {
   authInjector.registerFactory(() => AuthBloc(authInjector(), authInjector()));
 
   // //Cubit
-  authInjector.registerFactory(() => LoginCubit(authInjector()));
-  authInjector.registerFactory(() => RegisterCubit(authInjector()));
   authInjector
       .registerFactory(() => AuthFormCubit(authInjector(), authInjector()));
   //Core

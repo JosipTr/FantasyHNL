@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '../../../util/enums/enum.dart';
 import '../../bloc/auth_form_cubit/auth_form_cubit.dart';
-import '../../pages/login_page.dart';
 
 class RegisterForm extends StatelessWidget {
   const RegisterForm({super.key});
@@ -173,7 +171,8 @@ class _LoginButton extends StatelessWidget {
     final theme = Theme.of(context);
     return TextButton(
       key: const Key('loginForm_createAccount_flatButton'),
-      onPressed: () => Navigator.pushNamed(context, LoginPage.route),
+      onPressed: () =>
+          context.read<AuthFormCubit>().switchForm(AuthFilter.login),
       child: Text(
         'CREATE ACCOUNT',
         style: TextStyle(color: theme.primaryColor),

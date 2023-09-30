@@ -1,10 +1,7 @@
 import 'package:fantasy_hnl/features/authentication/presentation/bloc/auth_form_cubit/auth_form_cubit.dart';
-import 'package:fantasy_hnl/features/authentication/presentation/pages/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
-import '../../../util/enums/enum.dart';
 
 class LoginForm extends StatelessWidget {
   const LoginForm({super.key});
@@ -42,7 +39,7 @@ class LoginForm extends StatelessWidget {
               const SizedBox(height: 8),
               _GoogleLoginButton(),
               const SizedBox(height: 4),
-              _SignUpButton(),
+              _RegisterButton(),
             ],
           ),
         ),
@@ -144,13 +141,14 @@ class _GoogleLoginButton extends StatelessWidget {
   }
 }
 
-class _SignUpButton extends StatelessWidget {
+class _RegisterButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return TextButton(
       key: const Key('loginForm_createAccount_flatButton'),
-      onPressed: () => Navigator.pushNamed(context, RegisterPage.route),
+      onPressed: () =>
+          context.read<AuthFormCubit>().switchForm(AuthFilter.register),
       child: Text(
         'CREATE ACCOUNT',
         style: TextStyle(color: theme.primaryColor),

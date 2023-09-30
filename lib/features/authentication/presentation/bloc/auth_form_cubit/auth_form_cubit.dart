@@ -4,7 +4,6 @@ import 'package:fantasy_hnl/features/authentication/domain/usecases/login_email_
 import 'package:fantasy_hnl/features/authentication/domain/usecases/register.dart';
 import 'package:fantasy_hnl/features/authentication/util/parameters/auth_params.dart';
 
-import '../../../util/enums/enum.dart';
 import '../../models/confirm_password.dart';
 import '../../models/email.dart';
 import '../../models/password.dart';
@@ -60,5 +59,9 @@ class AuthFormCubit extends Cubit<AuthFormState> {
       ),
       (success) => state.copyWith(status: Status.success),
     );
+  }
+
+  void switchForm(AuthFilter authState) {
+    emit(state.copyWith(authFilter: authState));
   }
 }
