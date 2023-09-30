@@ -1,0 +1,9 @@
+export 'form_inputs/confirm_password_input.dart';
+export 'form_inputs/email_input.dart';
+export 'form_inputs/google_login_button.dart';
+export 'form_inputs/login_button.dart';
+export 'form_inputs/password_input.dart';
+export 'form_inputs/register_button.dart';
+export 'forms/login_form.dart';
+export 'forms/register_form.dart';
+export 'form_inputs/switch_form_button.dart';

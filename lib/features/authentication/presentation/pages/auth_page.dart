@@ -1,13 +1,11 @@
 import 'package:fantasy_hnl/features/authentication/di/auth_di.dart';
 import 'package:fantasy_hnl/features/authentication/presentation/bloc/auth_form_cubit/auth_form_cubit.dart';
-import 'package:fantasy_hnl/features/authentication/presentation/widgets/forms/register_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../widgets/forms/login_form.dart';
+import '../widgets/auth_widget.dart';
 
 class AuthPage extends StatelessWidget {
-  static const String route = "/login_page";
   const AuthPage({super.key});
 
   @override
