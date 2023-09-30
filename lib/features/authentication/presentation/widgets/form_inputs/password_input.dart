@@ -12,14 +12,17 @@ class PasswordInput extends StatelessWidget {
       buildWhen: (previous, current) => previous.password != current.password,
       builder: (context, state) {
         return TextField(
-          key: const Key('loginForm_passwordInput_textField'),
           onChanged: (password) =>
               context.read<AuthFormCubit>().passwordChanged(password),
           obscureText: true,
           decoration: InputDecoration(
-            labelText: 'password',
-            helperText: '',
-            errorText: state.password.displayError(state.password.value),
+            labelText: 'Password',
+            helperText: state.authFilter == AuthFilter.login
+                ? ''
+                : 'Enter 8 characters (number and letter)',
+            errorText: state.authFilter == AuthFilter.login
+                ? null
+                : state.password.displayError(state.password.value),
           ),
         );
       },

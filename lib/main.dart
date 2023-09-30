@@ -3,7 +3,7 @@
 import 'package:fantasy_hnl/features/authentication/presentation/bloc/auth_bloc/auth_bloc.dart';
 import 'package:fantasy_hnl/features/authentication/presentation/pages/auth_page.dart';
 import 'package:fantasy_hnl/firebase_options.dart';
-import 'package:fantasy_hnl/home_page.dart';
+import 'package:fantasy_hnl/features/home/presentation/pages/home_page.dart';
 import 'package:fantasy_hnl/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';

@@ -15,9 +15,11 @@ class EmailInput extends StatelessWidget {
               context.read<AuthFormCubit>().emailChanged(email),
           keyboardType: TextInputType.emailAddress,
           decoration: InputDecoration(
-              labelText: 'email',
+              labelText: 'Email',
               helperText: '',
-              errorText: state.email.displayError(state.email.value)),
+              errorText: state.authFilter == AuthFilter.login
+                  ? null
+                  : state.email.displayError(state.email.value)),
         );
       },
     );

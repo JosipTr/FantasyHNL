@@ -62,6 +62,16 @@ class AuthFormCubit extends Cubit<AuthFormState> {
   }
 
   void switchForm(AuthFilter authState) {
-    emit(state.copyWith(authFilter: authState));
+    emit(
+      state.copyWith(
+        authFilter: authState,
+        email: const Email.pure(),
+        password: const Password.pure(),
+        confirmPassword: const ConfirmPassword.pure(),
+        errorMessage: null,
+        status: Status.initial,
+        isValid: false,
+      ),
+    );
   }
 }

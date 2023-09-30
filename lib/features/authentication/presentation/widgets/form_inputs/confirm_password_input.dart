@@ -13,7 +13,6 @@ class ConfirmPasswordInput extends StatelessWidget {
           previous.confirmPassword != current.confirmPassword,
       builder: (context, state) {
         return TextField(
-          key: const Key('registerForm_confirmPassword_textField'),
           onChanged: (password) =>
               context.read<AuthFormCubit>().confirmPasswordChanged(password),
           obscureText: true,

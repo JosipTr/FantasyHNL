@@ -20,7 +20,9 @@ class LoginButton extends StatelessWidget {
                   ),
                   backgroundColor: const Color(0xFFFFD600),
                 ),
-                onPressed: state.isValid
+                onPressed: state.isValid &&
+                        state.email.value.isNotEmpty &&
+                        state.password.value.isNotEmpty
                     ? () => context.read<AuthFormCubit>().loginWithCredentials()
                     : null,
                 child: const Text('Login'),

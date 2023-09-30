@@ -19,7 +19,10 @@ class RegisterButton extends StatelessWidget {
                   ),
                   backgroundColor: const Color(0xFFFFD600),
                 ),
-                onPressed: state.isValid
+                onPressed: state.isValid &&
+                        state.email.value.isNotEmpty &&
+                        state.password.value.isNotEmpty &&
+                        state.confirmPassword!.value.isNotEmpty
                     ? () => context.read<AuthFormCubit>().register()
                     : null,
                 child: const Text('Register'),
