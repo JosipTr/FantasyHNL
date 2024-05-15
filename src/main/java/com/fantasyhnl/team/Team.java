@@ -19,7 +19,7 @@ public class Team {
     private String country;
     private String founded;
     private String logo;
-    @OneToMany
+    @OneToMany(mappedBy = "team")
     private Set<Player> players = new HashSet<>();
 
     public void addPlayer(Player player) {
