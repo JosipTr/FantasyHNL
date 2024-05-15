@@ -11,23 +11,30 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @ExceptionHandler({InvalidServerApiCallException.class})
-    public ResponseEntity<Object> handleInvalidServerApiCallException(InvalidServerApiCallException exception) {
+    protected ResponseEntity<Object> handleException(Exception exception) {
         logger.error(exception.getMessage(), exception);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
+    }
+
+    @ExceptionHandler({InvalidServerApiCallException.class})
+    protected ResponseEntity<Object> handleInvalidServerApiCallException(InvalidServerApiCallException exception) {
+        return handleException(exception);
     }
 
     @ExceptionHandler({InvalidJsonException.class})
-    public ResponseEntity<Object> handleInvalidJsonException(InvalidJsonException exception) {
-        logger.error(exception.getMessage(), exception);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
+    protected ResponseEntity<Object> handleInvalidJsonException(InvalidJsonException exception) {
+        return handleException(exception);
+    }
+
+    @ExceptionHandler({TeamListEmptyException.class})
+    protected ResponseEntity<Object> handleTeamListEmptyException(TeamListEmptyException exception) {
+        return handleException(exception);
+//        logger.error(exception.getMessage(), exception);
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
     }
 
     @ExceptionHandler({RuntimeException.class})
-    public ResponseEntity<Object> handleRuntimeException(RuntimeException exception) {
-        logger.error(exception.getMessage(), exception);
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(exception.getMessage());
+    protected ResponseEntity<Object> handleRuntimeException(RuntimeException exception) {
+        return handleException(exception);
     }
 }

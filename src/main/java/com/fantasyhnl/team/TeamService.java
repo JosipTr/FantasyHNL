@@ -1,5 +1,6 @@
 package com.fantasyhnl.team;
 
+import com.fantasyhnl.exception.TeamListEmptyException;
 import com.fantasyhnl.util.JsonToObjectMapper;
 import com.fantasyhnl.util.RestService;
 import com.fantasyhnl.util.Root;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.fantasyhnl.util.Constants.emptyList;
 import static com.fantasyhnl.util.Constants.teamUrl;
 
 @Service
@@ -27,7 +29,12 @@ public class TeamService {
     }
 
     public List<Team> getTeams() {
-        return teamRepository.findAll();
+        var teams = teamRepository.findAll();
+        if (teams.isEmpty()) {
+            throw new TeamListEmptyException(emptyList);
+        } else {
+            return teams;
+        }
     }
 
     public void addTeams() {
