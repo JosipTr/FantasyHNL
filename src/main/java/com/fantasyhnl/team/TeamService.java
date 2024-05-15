@@ -30,9 +30,9 @@ public class TeamService {
         this.modelMapper = modelMapper;
     }
 
-    public Team getTeam(int id) {
+    public TeamDto getTeam(int id) {
         var optionalTeam = teamRepository.findById(id);
-        return optionalTeam.orElse(null);
+        return optionalTeam.map(this::convertToDto).orElse(null);
     }
 
     public List<TeamDto> getTeams() {

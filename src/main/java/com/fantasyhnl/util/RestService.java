@@ -20,7 +20,7 @@ public class RestService {
         try {
             var response = restTemplate.getForEntity(path, String.class);
             var result = response.getStatusCode() == HttpStatus.OK ? response.getBody() : null;
-            logger.info("Rest service result: {}", result);
+            logger.info("Rest service result: {} \n", result);
             return result;
         } catch (RestClientException e) {
             throw new InvalidServerApiCallException("Invalid API call");

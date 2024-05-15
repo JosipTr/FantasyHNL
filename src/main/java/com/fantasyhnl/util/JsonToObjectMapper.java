@@ -20,7 +20,7 @@ public class JsonToObjectMapper {
         try {
             JavaType javaType = objectMapper.getTypeFactory().constructParametricType(Root.class, valueType);
             Root<S> root = objectMapper.readValue(body, javaType);
-            logger.info("Root object {}", root);
+            logger.info("Root object {} \n", root);
             return root;
         } catch (JsonProcessingException e) {
             throw new InvalidJsonException("Invalid JSON response");

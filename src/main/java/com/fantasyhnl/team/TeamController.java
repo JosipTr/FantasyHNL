@@ -17,6 +17,13 @@ public class TeamController {
     public TeamController(TeamService teamService) {
         this.teamService = teamService;
     }
+
+    @RequestMapping("/id")
+    public ResponseEntity<TeamDto> getTeam() {
+        var team = teamService.getTeam(1483);
+        return ResponseEntity.ok(team);
+    }
+
     @GetMapping
     public ResponseEntity<List<TeamDto>> getTeams() {
         var teams = teamService.getTeams();
