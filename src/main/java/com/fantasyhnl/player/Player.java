@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Data
 @Entity
 @EqualsAndHashCode(exclude = "team")
@@ -24,6 +27,8 @@ public class Player {
     private Team team;
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private Statistic statistic;
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    private Set<Statistic> fixtureStatistics = new HashSet<>();
 
     public void updatePlayer(Player player) {
         this.setFirstname(player.getFirstname());

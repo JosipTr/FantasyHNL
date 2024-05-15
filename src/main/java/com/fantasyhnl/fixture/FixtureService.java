@@ -16,8 +16,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import static com.fantasyhnl.util.Constants.emptyList;
-import static com.fantasyhnl.util.Constants.fixturesUrl;
+import static com.fantasyhnl.util.Constants.*;
+import static com.fantasyhnl.util.Constants.detailedFixture;
 
 @Service
 public class FixtureService {
@@ -78,7 +78,7 @@ public class FixtureService {
 //        }
 //    }
 
-//    @Transactional
+    //    @Transactional
     public void addFixtures() {
         var body = readFromFile();
         var root = objectMapper.mapToRootObject(body, FixtureResponse.class);
@@ -107,11 +107,48 @@ public class FixtureService {
             var savedFixture = fixtureRepository.save(fixture);
 //            savedFixture.setStatus(status);
         }
+        addStatistic();
+    }
+//    @Transactional
+//    private void addStatistic() {
+//        var fixtures = fixtureRepository.findAll();
+////        for (var fixture : fixtures) {
+//        var body = restService.getResponseBody(detailedFixture + 1034680);
+//        writeToOtherFile(body, 1034680);
+//        var root = objectMapper.mapToRootObject(body, DetailedFixtureResponse.class);
+////        }
+//    }
+
+//        @Transactional
+    private void addStatistic() {
+        var body = readFromOtherFile(1034680);
+        var root = objectMapper.mapToRootObject(body, DetailedFixtureResponse.class);
+        var response = root.getResponse();
+        for (var res : response) {
+            var d = res.getPlayers().get(0);
+            System.out.println(d.getPlayers().get(0).getStatistics());
+        }
     }
 
     private void writeToFile(String body) {
         try (FileWriter writer = new FileWriter("./src/main/resources/data/fixture/fixture.json")) {
             writer.write(body);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void writeToOtherFile(String body, int id) {
+        try (FileWriter writer = new FileWriter("./src/main/resources/data/fixture_detail/fixture_detail" + id + ".json")) {
+            writer.write(body);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String readFromOtherFile(int id) {
+        try {
+            return Files.readString(Path.of("./src/main/resources/data/fixture_detail/fixture_detail" + id + ".json"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
