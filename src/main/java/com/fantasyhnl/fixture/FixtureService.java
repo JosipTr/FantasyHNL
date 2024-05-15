@@ -1,10 +1,13 @@
 package com.fantasyhnl.fixture;
 
 import com.fantasyhnl.exception.EmptyListException;
+import com.fantasyhnl.team.Team;
+import com.fantasyhnl.team.TeamDto;
 import com.fantasyhnl.team.TeamRepository;
 import com.fantasyhnl.util.JsonToObjectMapper;
 import com.fantasyhnl.util.RestService;
 import jakarta.transaction.Transactional;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.io.FileWriter;
@@ -22,20 +25,22 @@ public class FixtureService {
     private final JsonToObjectMapper objectMapper;
     private final RestService restService;
     private final TeamRepository teamRepository;
+    private final ModelMapper modelMapper;
 
-    public FixtureService(FixtureRepository fixtureRepository, JsonToObjectMapper objectMapper, RestService restService, TeamRepository teamRepository) {
+    public FixtureService(FixtureRepository fixtureRepository, JsonToObjectMapper objectMapper, RestService restService, TeamRepository teamRepository, ModelMapper modelMapper) {
         this.fixtureRepository = fixtureRepository;
         this.objectMapper = objectMapper;
         this.restService = restService;
         this.teamRepository = teamRepository;
+        this.modelMapper = modelMapper;
     }
 
-    public List<Fixture> getFixtures() {
+    public List<FixtureDto> getFixtures() {
         var fixtures = fixtureRepository.findAll();
         if (fixtures.isEmpty()) {
             throw new EmptyListException(emptyList);
         } else {
-            return fixtures;
+            return fixtures.stream().map(this::convertToDto).toList();
         }
     }
 
@@ -73,7 +78,7 @@ public class FixtureService {
 //        }
 //    }
 
-    @Transactional
+//    @Transactional
     public void addFixtures() {
         var body = readFromFile();
         var root = objectMapper.mapToRootObject(body, FixtureResponse.class);
@@ -120,4 +125,7 @@ public class FixtureService {
         }
     }
 
+    private FixtureDto convertToDto(Fixture fixture) {
+        return modelMapper.map(fixture, FixtureDto.class);
+    }
 }
