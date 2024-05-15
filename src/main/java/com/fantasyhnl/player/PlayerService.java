@@ -4,6 +4,7 @@ import com.fantasyhnl.exception.EmptyListException;
 import com.fantasyhnl.team.TeamRepository;
 import com.fantasyhnl.util.JsonToObjectMapper;
 import com.fantasyhnl.util.RestService;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.io.FileWriter;
@@ -22,18 +23,20 @@ public class PlayerService {
     private final JsonToObjectMapper objectMapper;
     private final PlayerRepository playerRepository;
     private final TeamRepository teamRepository;
+    private final ModelMapper modelMapper;
 
-    public PlayerService(RestService restService, JsonToObjectMapper objectMapper, PlayerRepository playerRepository, TeamRepository teamRepository) {
+    public PlayerService(RestService restService, JsonToObjectMapper objectMapper, PlayerRepository playerRepository, TeamRepository teamRepository, ModelMapper modelMapper) {
         this.restService = restService;
         this.objectMapper = objectMapper;
         this.playerRepository = playerRepository;
         this.teamRepository = teamRepository;
+        this.modelMapper = modelMapper;
     }
 
-    public List<Player> getPlayers() {
+    public List<PlayerDto> getPlayers() {
         var players = playerRepository.findAll();
         if (players.isEmpty()) throw new EmptyListException(emptyList);
-        else return players;
+        else return players.stream().map(this::convertToDto).toList();
     }
 
     public void addPlayers() {
@@ -89,11 +92,15 @@ public class PlayerService {
         }
     }
 
-    public String readFromFile(int id) {
+    private String readFromFile(int id) {
         try {
             return Files.readString(Path.of("./src/main/resources/data/team_players/team_players" + id + ".json"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private PlayerDto convertToDto(Player player) {
+        return modelMapper.map(player, PlayerDto.class);
     }
 }

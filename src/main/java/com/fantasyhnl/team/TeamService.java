@@ -4,6 +4,7 @@ import com.fantasyhnl.exception.EmptyListException;
 import com.fantasyhnl.util.JsonToObjectMapper;
 import com.fantasyhnl.util.RestService;
 import com.fantasyhnl.util.Root;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.io.FileWriter;
@@ -20,11 +21,13 @@ public class TeamService {
     private final TeamRepository teamRepository;
     private final RestService restService;
     private final JsonToObjectMapper objectMapper;
+    private final ModelMapper modelMapper;
 
-    public TeamService(TeamRepository teamRepository, RestService restService, JsonToObjectMapper objectMapper) {
+    public TeamService(TeamRepository teamRepository, RestService restService, JsonToObjectMapper objectMapper, ModelMapper modelMapper) {
         this.teamRepository = teamRepository;
         this.restService = restService;
         this.objectMapper = objectMapper;
+        this.modelMapper = modelMapper;
     }
 
     public Team getTeam(int id) {
@@ -32,12 +35,14 @@ public class TeamService {
         return optionalTeam.orElse(null);
     }
 
-    public List<Team> getTeams() {
+    public List<TeamDto> getTeams() {
         var teams = teamRepository.findAll();
         if (teams.isEmpty()) {
             throw new EmptyListException(emptyList);
         } else {
-            return teams;
+            var d = teams.stream().map(this::convertToDto).toList();
+            System.out.println(d);
+            return d;
         }
     }
 
@@ -70,11 +75,15 @@ public class TeamService {
         }
     }
 
-    public String readFromFile() {
+    private String readFromFile() {
         try {
             return Files.readString(Path.of("./src/main/resources/data/team/teams.json"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private TeamDto convertToDto(Team team) {
+        return modelMapper.map(team, TeamDto.class);
     }
 }

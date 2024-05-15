@@ -18,7 +18,7 @@ public class TeamController {
         this.teamService = teamService;
     }
     @GetMapping
-    public ResponseEntity<List<Team>> getTeams() {
+    public ResponseEntity<List<TeamDto>> getTeams() {
         var teams = teamService.getTeams();
         return ResponseEntity.ok(teams);
     }
