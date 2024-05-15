@@ -26,8 +26,8 @@ public class GlobalExceptionHandler {
         return handleException(exception);
     }
 
-    @ExceptionHandler({TeamListEmptyException.class})
-    protected ResponseEntity<Object> handleTeamListEmptyException(TeamListEmptyException exception) {
+    @ExceptionHandler({EmptyListException.class})
+    protected ResponseEntity<Object> handleTeamListEmptyException(EmptyListException exception) {
         return handleException(exception);
 //        logger.error(exception.getMessage(), exception);
 //        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
