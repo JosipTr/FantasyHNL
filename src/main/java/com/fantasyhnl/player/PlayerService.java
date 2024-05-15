@@ -4,6 +4,7 @@ import com.fantasyhnl.exception.EmptyListException;
 import com.fantasyhnl.team.TeamRepository;
 import com.fantasyhnl.util.JsonToObjectMapper;
 import com.fantasyhnl.util.RestService;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +15,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.fantasyhnl.util.Constants.emptyList;
-import static com.fantasyhnl.util.Constants.playerBasicUrl;
+import static com.fantasyhnl.util.Constants.*;
 
 @Service
 public class PlayerService {
@@ -39,11 +39,29 @@ public class PlayerService {
         else return players.stream().map(this::convertToDto).toList();
     }
 
+//    public void addPlayers() {
+//        var teams = teamRepository.findAll();
+//        for (var team : teams) {
+//            var body = readFromFile(team.getId());
+//            writeToFile(body, team.getId());
+//            var root = objectMapper.mapToRootObject(body, BasicPlayerResponse.class);
+//            var response = root.getResponse();
+//            for (var res : response) {
+//                var players = res.getPlayers();
+//                for (var player : players) {
+//                    player.setTeam(team);
+//                    team.addPlayer(player);
+//                    playerRepository.save(player);
+//                }
+//            }
+//        }
+//    }
+
+    @Transactional
     public void addPlayers() {
         var teams = teamRepository.findAll();
         for (var team : teams) {
             var body = readFromFile(team.getId());
-            writeToFile(body, team.getId());
             var root = objectMapper.mapToRootObject(body, BasicPlayerResponse.class);
             var response = root.getResponse();
             for (var res : response) {
@@ -52,6 +70,17 @@ public class PlayerService {
                     player.setTeam(team);
                     team.addPlayer(player);
                     playerRepository.save(player);
+                }
+            }
+        }
+        var players = playerRepository.findAll();
+        for (var player : players) {
+            for (var i = 1; i <= 28; i++) {
+                var body = readFromOtherFile(i);
+                var root = objectMapper.mapToRootObject(body, PlayerResponse.class);
+                var response = root.getResponse();
+                for (var res : response) {
+                    if (player.getId() == res.getPlayer().getId()) player.updatePlayer(res.getPlayer());
                 }
             }
         }
@@ -76,9 +105,9 @@ public class PlayerService {
 //        }
 //    }
 
-    private void waitSeconds() {
+    private void waitSeconds(int seconds) {
         try {
-            TimeUnit.SECONDS.sleep(5);
+            TimeUnit.SECONDS.sleep(seconds);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -92,9 +121,25 @@ public class PlayerService {
         }
     }
 
+    private void writeToOtherFile(String body, int id) {
+        try (FileWriter writer = new FileWriter("./src/main/resources/data/players/players" + id + ".json")) {
+            writer.write(body);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private String readFromFile(int id) {
         try {
             return Files.readString(Path.of("./src/main/resources/data/team_players/team_players" + id + ".json"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String readFromOtherFile(int id) {
+        try {
+            return Files.readString(Path.of("./src/main/resources/data/players/players" + id + ".json"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

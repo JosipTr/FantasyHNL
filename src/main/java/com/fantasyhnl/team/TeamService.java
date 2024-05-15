@@ -40,9 +40,7 @@ public class TeamService {
         if (teams.isEmpty()) {
             throw new EmptyListException(emptyList);
         } else {
-            var d = teams.stream().map(this::convertToDto).toList();
-            System.out.println(d);
-            return d;
+            return teams.stream().map(this::convertToDto).toList();
         }
     }
 

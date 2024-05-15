@@ -7,9 +7,12 @@ import lombok.Data;
 public class PlayerDto {
     private int id;
     private String name;
-    private int age;
-    private int number;
+    private String firstname;
+    private String lastname;
+    private Integer age;
+    private Integer number;
     private String position;
+    private Boolean injured;
     private String photo;
     private TeamNonPlayersDto team;
 }
