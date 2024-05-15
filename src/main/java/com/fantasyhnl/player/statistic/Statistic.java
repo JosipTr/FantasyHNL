@@ -28,9 +28,10 @@ public class Statistic {
     @JsonIgnore
     private Player player;
 
-    public void updateStatistic(Statistic statistic) {
+    public Statistic updateStatistic(Statistic statistic) {
         this.goals.setGoals(statistic.getGoals());
         this.cards.setCards(statistic.getCards());
         this.penalty.setPenalty(statistic.getPenalty());
+        return this;
     }
 }

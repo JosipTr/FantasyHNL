@@ -32,6 +32,6 @@ public class Player {
     }
 
     public void updateStatistic(Statistic statistic) {
-        this.setStatistic(statistic);
+        this.setStatistic(this.statistic.updateStatistic(statistic));
     }
 }

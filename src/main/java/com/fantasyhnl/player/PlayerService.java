@@ -119,9 +119,7 @@ public class PlayerService {
                         player.updatePlayer(res.getPlayer());
                         var stats = res.getStatistics();
                         for (var stat : stats) {
-                            var playerStat = player.getStatistic();
-                            playerStat.updateStatistic(stat);
-                            player.updateStatistic(playerStat);
+                            player.updateStatistic(stat);
                         }
                     }
                 }
