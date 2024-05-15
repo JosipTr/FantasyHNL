@@ -1,10 +1,7 @@
 package com.fantasyhnl.player;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,5 +24,11 @@ public class PlayerController {
     public ResponseEntity<String> addPlayers() {
         playerService.addPlayers();
         return ResponseEntity.ok("Resource created successfully");
+    }
+
+    @PutMapping
+    public ResponseEntity<String> updatePlayers() {
+        playerService.updatePlayers();
+        return ResponseEntity.ok("Resource updated successfully");
     }
 }

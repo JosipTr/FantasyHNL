@@ -24,4 +24,10 @@ public class Cards {
     @OneToOne
     @JsonIgnore
     private Player player;
+
+    public void setCards(Cards cards) {
+        this.setYellow(cards.getYellow());
+        this.setYellowred(cards.getYellowred());
+        this.setRed(cards.getRed());
+    }
 }

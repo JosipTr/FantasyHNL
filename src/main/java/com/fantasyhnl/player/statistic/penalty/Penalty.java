@@ -26,4 +26,12 @@ public class Penalty {
     @OneToOne
     @JsonIgnore
     private Player player;
+
+    public void setPenalty(Penalty penalty) {
+        this.setWon(penalty.getWon());
+        this.setCommited(penalty.getCommited());
+        this.setScored(penalty.getScored());
+        this.setMissed(penalty.getMissed());
+        this.setSaved(penalty.getSaved());
+    }
 }

@@ -25,4 +25,11 @@ public class Goals {
     @OneToOne
     @JsonIgnore
     private Player player;
+
+    public void setGoals(Goals goals) {
+        this.setTotal(goals.getTotal());
+        this.setConceded(goals.getConceded());
+        this.setAssists(goals.getAssists());
+        this.setSaves(goals.getSaves());
+    }
 }

@@ -1,6 +1,10 @@
 package com.fantasyhnl.player;
 
 import com.fantasyhnl.exception.EmptyListException;
+import com.fantasyhnl.player.statistic.Statistic;
+import com.fantasyhnl.player.statistic.cards.Cards;
+import com.fantasyhnl.player.statistic.goals.Goals;
+import com.fantasyhnl.player.statistic.penalty.Penalty;
 import com.fantasyhnl.team.TeamRepository;
 import com.fantasyhnl.util.JsonToObjectMapper;
 import com.fantasyhnl.util.RestService;
@@ -102,6 +106,29 @@ public class PlayerService {
         }
     }
 
+    @Transactional
+    public void updatePlayers() {
+        var players = playerRepository.findAll();
+        for (var player : players) {
+            for (var i = 1; i <= 28; i++) {
+                var body = readFromOtherFile(i);
+                var root = objectMapper.mapToRootObject(body, PlayerResponse.class);
+                var response = root.getResponse();
+                for (var res : response) {
+                    if (player.getId() == res.getPlayer().getId()) {
+                        player.updatePlayer(res.getPlayer());
+                        var stats = res.getStatistics();
+                        for (var stat : stats) {
+                            var playerStat = player.getStatistic();
+                            playerStat.updateStatistic(stat);
+                            player.updateStatistic(playerStat);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 //    public void addPlayers() {
 //        var teams = teamRepository.findAll();
 //        for (var team : teams) {
@@ -164,4 +191,5 @@ public class PlayerService {
     private PlayerDto convertToDto(Player player) {
         return modelMapper.map(player, PlayerDto.class);
     }
+
 }

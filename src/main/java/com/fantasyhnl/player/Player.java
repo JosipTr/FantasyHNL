@@ -30,4 +30,8 @@ public class Player {
         this.setLastname(player.getLastname());
         this.setInjured(player.getInjured());
     }
+
+    public void updateStatistic(Statistic statistic) {
+        this.setStatistic(statistic);
+    }
 }
