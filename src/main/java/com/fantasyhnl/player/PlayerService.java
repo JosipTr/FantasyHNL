@@ -80,7 +80,23 @@ public class PlayerService {
                 var root = objectMapper.mapToRootObject(body, PlayerResponse.class);
                 var response = root.getResponse();
                 for (var res : response) {
-                    if (player.getId() == res.getPlayer().getId()) player.updatePlayer(res.getPlayer());
+                    if (player.getId() == res.getPlayer().getId()) {
+                        player.updatePlayer(res.getPlayer());
+                        var stats = res.getStatistics();
+                        for (var stat : stats) {
+                            var cards = stat.getCards();
+                            var penalty = stat.getPenalty();
+                            var goals = stat.getGoals();
+                            cards.setPlayer(player);
+                            penalty.setPlayer(player);
+                            goals.setPlayer(player);
+                            stat.setPlayer(player);
+                            stat.setCards(cards);
+                            stat.setGoals(goals);
+                            stat.setPenalty(penalty);
+                            player.setStatistic(stat);
+                        }
+                    }
                 }
             }
         }

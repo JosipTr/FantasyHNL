@@ -1,9 +1,8 @@
 package com.fantasyhnl.player;
 
+import com.fantasyhnl.player.statistic.Statistic;
 import com.fantasyhnl.team.Team;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -23,6 +22,8 @@ public class Player {
     private String photo;
     @ManyToOne
     private Team team;
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    private Statistic statistic;
 
     public void updatePlayer(Player player) {
         this.setFirstname(player.getFirstname());

@@ -1,5 +1,6 @@
 package com.fantasyhnl.team;
 
+import com.fantasyhnl.player.statistic.Statistic;
 import lombok.Data;
 
 @Data

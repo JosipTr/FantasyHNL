@@ -1,5 +1,6 @@
 package com.fantasyhnl.player;
 
+import com.fantasyhnl.player.statistic.Statistic;
 import com.fantasyhnl.team.TeamNonPlayersDto;
 import lombok.Data;
 
@@ -15,4 +16,5 @@ public class PlayerDto {
     private Boolean injured;
     private String photo;
     private TeamNonPlayersDto team;
+    private Statistic statistic;
 }
