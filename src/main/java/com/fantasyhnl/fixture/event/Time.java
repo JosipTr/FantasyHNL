@@ -1,4 +1,4 @@
-package com.fantasyhnl.fixture.events;
+package com.fantasyhnl.fixture.event;
 
 import com.fantasyhnl.fixture.Fixture;
 import com.fasterxml.jackson.annotation.JsonIgnore;

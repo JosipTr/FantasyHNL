@@ -110,7 +110,7 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
             time.setFixture(fixture);
             event.setFixture(fixture);
             event.setTime(time);
-//            fixture.addEvent(event);
+            fixture.addEvent(event);
         }
     }
 

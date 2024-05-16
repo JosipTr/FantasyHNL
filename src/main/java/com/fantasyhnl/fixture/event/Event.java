@@ -1,4 +1,4 @@
-package com.fantasyhnl.fixture.events;
+package com.fantasyhnl.fixture.event;
 
 import com.fantasyhnl.fixture.Fixture;
 import com.fantasyhnl.player.Player;
@@ -8,13 +8,12 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.hibernate.annotations.Cascade;
 
 @Entity
 @Data
 @EqualsAndHashCode(exclude = {"fixture"})
 @ToString(exclude = {"fixture"})
-public class Events {
+public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;

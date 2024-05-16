@@ -1,4 +1,4 @@
-package com.fantasyhnl.fixture.events;
+package com.fantasyhnl.fixture.event;
 
 import jakarta.persistence.Embeddable;
 import lombok.Data;

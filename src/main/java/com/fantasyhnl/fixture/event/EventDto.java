@@ -1,16 +1,11 @@
-package com.fantasyhnl.fixture.events;
+package com.fantasyhnl.fixture.event;
 
-import com.fantasyhnl.fixture.Fixture;
-import com.fantasyhnl.player.Player;
 import com.fantasyhnl.player.PlayerNonTeamDto;
-import com.fantasyhnl.team.Team;
 import com.fantasyhnl.team.TeamNonPlayersDto;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
-public class EventsDto {
+public class EventDto {
     private int id;
     private Time time;
     private TeamNonPlayersDto team;

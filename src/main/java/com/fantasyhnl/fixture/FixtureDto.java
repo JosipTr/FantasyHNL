@@ -1,6 +1,6 @@
 package com.fantasyhnl.fixture;
 
-import com.fantasyhnl.fixture.events.EventsDto;
+import com.fantasyhnl.fixture.event.EventDto;
 import com.fantasyhnl.fixture.goals.Goals;
 import com.fantasyhnl.fixture.status.Status;
 import com.fantasyhnl.fixture.teams.TeamsDto;
@@ -20,5 +20,5 @@ public class FixtureDto {
     private String round;
     private TeamsDto teams;
     private Goals goals;
-    private List<EventsDto> events;
+    private List<EventDto> events;
 }

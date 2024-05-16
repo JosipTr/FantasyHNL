@@ -1,5 +1,6 @@
 package com.fantasyhnl.fixture;
 
+import com.fantasyhnl.fixture.event.Event;
 import com.fantasyhnl.fixture.goals.Goals;
 import com.fantasyhnl.fixture.status.Status;
 import com.fantasyhnl.fixture.teams.Teams;
@@ -7,6 +8,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
@@ -24,10 +27,10 @@ public class Fixture {
     private Teams teams;
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "fixture")
     private Goals goals;
-//    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "fixture")
-//    private Set<Events> events = new HashSet<>();
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "fixture")
+    private Set<Event> events = new HashSet<>();
 
-//    public void addEvent(Events events) {
-//        this.events.add(events);
-//    }
+    public void addEvent(Event event) {
+        this.events.add(event);
+    }
 }
