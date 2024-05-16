@@ -14,6 +14,7 @@ import lombok.ToString;
 @ToString(exclude = "fixture")
 public class Goals {
     @Id
+    @JsonIgnore
     private int id;
     private Integer home;
     private Integer away;

@@ -16,8 +16,9 @@ import lombok.ToString;
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @JsonIgnore
     private int id;
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private Time time;
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Team team;

@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 public class HomeDto {
-    private int id;
     private Boolean winner;
     private TeamNonPlayersDto team;
 }

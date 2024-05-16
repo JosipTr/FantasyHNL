@@ -14,6 +14,7 @@ import lombok.ToString;
 public class Time {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @JsonIgnore
     private int id;
 //    @EmbeddedId
 //    private TimeId id;

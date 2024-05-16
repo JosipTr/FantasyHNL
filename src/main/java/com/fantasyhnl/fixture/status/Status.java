@@ -15,6 +15,7 @@ import lombok.ToString;
 @ToString(exclude = "fixture")
 public class Status {
     @Id
+    @JsonIgnore
     private int id;
     @JsonProperty("long")
     private String myLong;
