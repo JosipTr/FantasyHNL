@@ -20,4 +20,5 @@ public class Fixture {
     private int timestamp;
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "fixture")
     private Status status;
+    private String round;
 }

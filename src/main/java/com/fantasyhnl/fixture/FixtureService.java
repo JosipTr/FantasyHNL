@@ -37,8 +37,11 @@ public class FixtureService {
         for (var res : response) {
             var fixture = res.getFixture();
             var status = fixture.getStatus();
+            var league = res.getLeague();
+            var round = league.getRound();
             status.setFixture(fixture);
             fixture.setStatus(status);
+            fixture.setRound(round);
             fixtureRepository.save(fixture);
         }
     }
