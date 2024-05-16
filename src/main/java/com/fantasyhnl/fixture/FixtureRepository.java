@@ -1,6 +1,6 @@
 package com.fantasyhnl.fixture;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.fantasyhnl.util.BaseRepository;
 
-public interface FixtureRepository extends JpaRepository<Fixture, Integer> {
+public interface FixtureRepository extends BaseRepository<Fixture> {
 }

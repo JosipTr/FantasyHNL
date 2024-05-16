@@ -31,6 +31,12 @@ public class BaseController<T, D> {
         return ResponseEntity.status(HttpStatus.CREATED).body("Resources created");
     }
 
+    @PutMapping
+    public ResponseEntity<String> update() {
+        baseService.update();
+        return ResponseEntity.ok("Resources updated");
+    }
+
     @DeleteMapping
     public ResponseEntity<String> delete() {
         baseService.delete();

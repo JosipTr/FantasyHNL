@@ -1,6 +1,5 @@
 package com.fantasyhnl.fixture;
 
-import com.fantasyhnl.fixture.events.Events;
 import com.fantasyhnl.fixture.events.EventsDto;
 import com.fantasyhnl.fixture.goals.Goals;
 import com.fantasyhnl.fixture.status.Status;

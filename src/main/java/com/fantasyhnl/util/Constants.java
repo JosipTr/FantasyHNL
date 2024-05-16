@@ -10,6 +10,8 @@ public class Constants {
     public static final String teamFilePath = "./src/main/resources/data/team/teams.json";
     public static final String basicPlayerPath = "./src/main/resources/data/team_players/team_players";
     public static final String playerPath = "./src/main/resources/data/players/players";
+    public static final String fixturePath = "./src/main/resources/data/fixture/fixture.json";
+    public static final String fixtureDetailPath = "./src/main/resources/data/fixture_detail/fixture_detail";
 
     public static final String emptyList = "The list is empty";
 }

@@ -1,85 +1,31 @@
 package com.fantasyhnl.fixture;
 
-import com.fantasyhnl.fixture.events.Events;
-import com.fantasyhnl.fixture.events.EventsDto;
-import com.fantasyhnl.fixture.goals.Goals;
-import com.fantasyhnl.fixture.teams.TeamsDto;
-import com.fantasyhnl.player.Player;
-import com.fantasyhnl.player.PlayerDto;
 import com.fantasyhnl.player.PlayerRepository;
 import com.fantasyhnl.team.TeamRepository;
+import com.fantasyhnl.util.BaseRepository;
+import com.fantasyhnl.util.BaseService;
 import com.fantasyhnl.util.JsonToObjectMapper;
 import com.fantasyhnl.util.RestService;
 import jakarta.transaction.Transactional;
-import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeMap;
-import org.modelmapper.spi.MappingContext;
 import org.springframework.stereotype.Service;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import static com.fantasyhnl.util.Constants.detailedFixture;
+import static com.fantasyhnl.util.Constants.*;
 
 @Service
-public class FixtureService {
-    private final FixtureRepository fixtureRepository;
-    private final JsonToObjectMapper objectMapper;
-    private final ModelMapper modelMapper;
-    private final RestService restService;
+public class FixtureService extends BaseService<Fixture, FixtureDto> {
     private final TeamRepository teamRepository;
     private final PlayerRepository playerRepository;
 
-    public FixtureService(FixtureRepository fixtureRepository, JsonToObjectMapper objectMapper, ModelMapper modelMapper, RestService restService, TeamRepository teamRepository, PlayerRepository playerRepository) {
-        this.fixtureRepository = fixtureRepository;
-        this.objectMapper = objectMapper;
-        this.modelMapper = modelMapper;
-        this.restService = restService;
+    protected FixtureService(RestService restService, JsonToObjectMapper objectMapper, ModelMapper modelMapper, BaseRepository<Fixture> baseRepository, TeamRepository teamRepository, PlayerRepository playerRepository) {
+        super(restService, objectMapper, modelMapper, baseRepository);
         this.teamRepository = teamRepository;
         this.playerRepository = playerRepository;
     }
 
-    public List<FixtureDto> getFixtures() {
-        var fixtures = fixtureRepository.findAll();
-        return fixtures.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-    }
-
-    public FixtureDto convertToDto(Fixture fixture) {
-        // Map events to EventsDto before mapping Fixture to FixtureDto
-        List<EventsDto> eventsDtoList = fixture.getEvents().stream()
-                .map(events -> modelMapper.map(events, EventsDto.class))
-                .collect(Collectors.toList());
-
-        // Create a new FixtureDto object and set its events field
-        FixtureDto fixtureDto = new FixtureDto();
-        fixtureDto.setEvents(eventsDtoList);
-
-        // Map individual fields from Fixture to FixtureDto
-        fixtureDto.setId(fixture.getId());
-        fixtureDto.setReferee(fixture.getReferee());
-        fixtureDto.setTimezone(fixture.getTimezone());
-        fixtureDto.setDate(fixture.getDate());
-        fixtureDto.setTimestamp(fixture.getTimestamp());
-        fixtureDto.setStatus(fixture.getStatus());
-        fixtureDto.setRound(fixture.getRound());
-        fixtureDto.setTeams(modelMapper.map(fixture.getTeams(), TeamsDto.class));
-        fixtureDto.setGoals(fixture.getGoals());
-
-        return fixtureDto;
-    }
-
-
-
-    public void addFixtures() {
-        var body = readFromFile();
+    @Override
+    public void add() {
+        var body = readFromFile(fixturePath);
         var root = objectMapper.mapToRootObject(body, FixtureResponse.class);
         var response = root.getResponse();
         for (var res : response) {
@@ -96,65 +42,27 @@ public class FixtureService {
             fixture.setRound(round);
             fixture.setGoals(goals);
             setFixtureTeams(res);
-            fixtureRepository.save(fixture);
+            baseRepository.save(fixture);
         }
     }
 
+    @Override
     @Transactional
-    public void updateFixtures() {
-        var fixtures = fixtureRepository.findAll();
+    public void update() {
+        var fixtures = baseRepository.findAll();
         for (var fix : fixtures) {
             if (fix.getId() >= 1034786) break;
-            var body = readFromOtherFile(fix.getId());
+            var url = fixtureDetailPath + fix.getId() + ".json";
+            var body = readFromFile(url);
             var root = objectMapper.mapToRootObject(body, FixtureResponse.class);
             var response = root.getResponse();
             for (var res : response) {
                 var fixtureId = res.getFixture().getId();
-                var fixtureOpt = fixtureRepository.findById(fixtureId);
+                var fixtureOpt = baseRepository.findById(fixtureId);
                 if (fixtureOpt.isEmpty()) continue;
                 var fixture = fixtureOpt.get();
                 setFixtureEvents(res, fixture);
             }
-        }
-    }
-
-    private void waitSeconds(int seconds) {
-        try {
-            TimeUnit.SECONDS.sleep(seconds);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void writeToFile(String body, int id) {
-        try (FileWriter writer = new FileWriter("./src/main/resources/data/fixture/fixture.json")) {
-            writer.write(body);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void writeToOtherFile(String body, int id) {
-        try (FileWriter writer = new FileWriter("./src/main/resources/data/fixture_detail/fixture_detail" + id + ".json")) {
-            writer.write(body);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private String readFromFile() {
-        try {
-            return Files.readString(Path.of("./src/main/resources/data/fixture/fixture.json"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private String readFromOtherFile(int id) {
-        try {
-            return Files.readString(Path.of("./src/main/resources/data/fixture_detail/fixture_detail" + id + ".json"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -202,7 +110,12 @@ public class FixtureService {
             time.setFixture(fixture);
             event.setFixture(fixture);
             event.setTime(time);
-            fixture.addEvent(event);
+//            fixture.addEvent(event);
         }
+    }
+
+    @Override
+    protected Class<FixtureDto> getDtoClass() {
+        return FixtureDto.class;
     }
 }

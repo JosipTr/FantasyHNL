@@ -1,6 +1,5 @@
 package com.fantasyhnl.player;
 
-import com.fantasyhnl.exception.EmptyListException;
 import com.fantasyhnl.team.TeamRepository;
 import com.fantasyhnl.util.BaseRepository;
 import com.fantasyhnl.util.BaseService;
@@ -9,13 +8,6 @@ import com.fantasyhnl.util.RestService;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static com.fantasyhnl.util.Constants.*;
 
