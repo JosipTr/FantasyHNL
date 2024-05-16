@@ -31,6 +31,12 @@ public class BaseController<T, D> {
         return ResponseEntity.status(HttpStatus.CREATED).body("Resources created");
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateById(@PathVariable int id) {
+        baseService.updateById(id);
+        return ResponseEntity.ok("Resource updated");
+    }
+
     @PutMapping
     public ResponseEntity<String> update() {
         baseService.update();

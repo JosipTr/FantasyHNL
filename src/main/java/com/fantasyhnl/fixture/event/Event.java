@@ -32,4 +32,8 @@ public class Event {
     @ManyToOne
     @JsonIgnore
     private Fixture fixture;
+
+    public void setEvent(Event event) {
+        this.time.setTime(event.getTime());
+    }
 }

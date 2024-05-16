@@ -48,6 +48,10 @@ public abstract class BaseService<T, D> {
 
     public abstract void update();
 
+    protected void updateById(int id) {
+
+    }
+
     protected void waitSeconds(int seconds) {
         try {
             TimeUnit.SECONDS.sleep(seconds);

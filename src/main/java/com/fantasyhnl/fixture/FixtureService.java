@@ -1,5 +1,6 @@
 package com.fantasyhnl.fixture;
 
+import com.fantasyhnl.exception.InvalidIdException;
 import com.fantasyhnl.player.PlayerRepository;
 import com.fantasyhnl.team.TeamRepository;
 import com.fantasyhnl.util.BaseRepository;
@@ -63,6 +64,26 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
                 var fixture = fixtureOpt.get();
                 setFixtureEvents(res, fixture);
             }
+        }
+    }
+
+    @Transactional
+    @Override
+    public void updateById(int id) {
+        var fixtureOpt = baseRepository.findById(id);
+        if (fixtureOpt.isEmpty()) throw new InvalidIdException("Invalid ID");
+        var fix = fixtureOpt.get();
+        var url = fixtureDetailPath + fix.getId() + ".json";
+        var body = readFromFile(url);
+        var root = objectMapper.mapToRootObject(body, FixtureResponse.class);
+        var response = root.getResponse();
+        fix.removeEvents();
+        for (var res : response) {
+            var goals = res.getGoals();
+            var g = fix.getGoals();
+            g.setGoals(goals);
+            fix.setGoals(g);
+            setFixtureEvents(res, fix);
         }
     }
 
