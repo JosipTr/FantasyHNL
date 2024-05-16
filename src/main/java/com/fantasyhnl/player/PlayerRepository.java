@@ -1,6 +1,6 @@
 package com.fantasyhnl.player;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.fantasyhnl.util.BaseRepository;
 
-public interface PlayerRepository extends JpaRepository<Player, Integer> {
+public interface PlayerRepository extends BaseRepository<Player> {
 }

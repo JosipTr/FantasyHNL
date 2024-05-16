@@ -2,6 +2,8 @@ package com.fantasyhnl.player;
 
 import com.fantasyhnl.exception.EmptyListException;
 import com.fantasyhnl.team.TeamRepository;
+import com.fantasyhnl.util.BaseRepository;
+import com.fantasyhnl.util.BaseService;
 import com.fantasyhnl.util.JsonToObjectMapper;
 import com.fantasyhnl.util.RestService;
 import jakarta.transaction.Transactional;
@@ -18,50 +20,22 @@ import java.util.concurrent.TimeUnit;
 import static com.fantasyhnl.util.Constants.*;
 
 @Service
-public class PlayerService {
-    private final RestService restService;
-    private final JsonToObjectMapper objectMapper;
-    private final PlayerRepository playerRepository;
+public class PlayerService extends BaseService<Player, PlayerDto> {
+
     private final TeamRepository teamRepository;
-    private final ModelMapper modelMapper;
 
-    public PlayerService(RestService restService, JsonToObjectMapper objectMapper, PlayerRepository playerRepository, TeamRepository teamRepository, ModelMapper modelMapper) {
-        this.restService = restService;
-        this.objectMapper = objectMapper;
-        this.playerRepository = playerRepository;
+    protected PlayerService(RestService restService, JsonToObjectMapper objectMapper, ModelMapper modelMapper, BaseRepository<Player> baseRepository, TeamRepository teamRepository) {
+        super(restService, objectMapper, modelMapper, baseRepository);
         this.teamRepository = teamRepository;
-        this.modelMapper = modelMapper;
     }
 
-    public List<PlayerDto> getPlayers() {
-        var players = playerRepository.findAll();
-        if (players.isEmpty()) throw new EmptyListException(emptyList);
-        else return players.stream().map(this::convertToDto).toList();
-    }
-
-//    public void addPlayers() {
-//        var teams = teamRepository.findAll();
-//        for (var team : teams) {
-//            var body = readFromFile(team.getId());
-//            writeToFile(body, team.getId());
-//            var root = objectMapper.mapToRootObject(body, BasicPlayerResponse.class);
-//            var response = root.getResponse();
-//            for (var res : response) {
-//                var players = res.getPlayers();
-//                for (var player : players) {
-//                    player.setTeam(team);
-//                    team.addPlayer(player);
-//                    playerRepository.save(player);
-//                }
-//            }
-//        }
-//    }
-
+    @Override
     @Transactional
-    public void addPlayers() {
+    public void add() {
         var teams = teamRepository.findAll();
         for (var team : teams) {
-            var body = readFromFile(team.getId());
+            var url = basicPlayerPath + team.getId() + ".json";
+            var body = readFromFile(url);
             var root = objectMapper.mapToRootObject(body, BasicPlayerResponse.class);
             var response = root.getResponse();
             for (var res : response) {
@@ -69,14 +43,15 @@ public class PlayerService {
                 for (var player : players) {
                     player.setTeam(team);
                     team.addPlayer(player);
-                    playerRepository.save(player);
+                    baseRepository.save(player);
                 }
             }
         }
-        var players = playerRepository.findAll();
+        var players = baseRepository.findAll();
         for (var player : players) {
             for (var i = 1; i <= 28; i++) {
-                var body = readFromOtherFile(i);
+                var url = playerPath + i + ".json";
+                var body = readFromFile(url);
                 var root = objectMapper.mapToRootObject(body, PlayerResponse.class);
                 var response = root.getResponse();
                 for (var res : response) {
@@ -88,84 +63,11 @@ public class PlayerService {
         }
     }
 
-    @Transactional
-    public void updatePlayers() {
-        var players = playerRepository.findAll();
-        for (var player : players) {
-            for (var i = 1; i <= 28; i++) {
-                var body = readFromOtherFile(i);
-                var root = objectMapper.mapToRootObject(body, PlayerResponse.class);
-                var response = root.getResponse();
-                for (var res : response) {
-                    if (player.getId() == res.getPlayer().getId()) {
-                        player.updatePlayer(res.getPlayer());
-                    }
-                }
-            }
-        }
+    @Override
+    public void update() {}
+
+    @Override
+    protected Class<PlayerDto> getDtoClass() {
+        return PlayerDto.class;
     }
-
-//    public void addPlayers() {
-//        var teams = teamRepository.findAll();
-//        for (var team : teams) {
-//            var body = restService.getResponseBody(playerBasicUrl + team.getId());
-//            writeToFile(body, team.getId());
-//            var root = objectMapper.mapToRootObject(body, BasicPlayerResponse.class);
-//            var response = root.getResponse();
-//            for (var res : response) {
-//                var players = res.getPlayers();
-//                for (var player : players) {
-//                    player.setTeam(team);
-//                    team.addPlayer(player);
-//                    playerRepository.save(player);
-//                }
-//            }
-//            waitSeconds();
-//        }
-//    }
-
-    private void waitSeconds(int seconds) {
-        try {
-            TimeUnit.SECONDS.sleep(seconds);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void writeToFile(String body, int id) {
-        try (FileWriter writer = new FileWriter("./src/main/resources/data/team_players/team_players" + id + ".json")) {
-            writer.write(body);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void writeToOtherFile(String body, int id) {
-        try (FileWriter writer = new FileWriter("./src/main/resources/data/players/players" + id + ".json")) {
-            writer.write(body);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private String readFromFile(int id) {
-        try {
-            return Files.readString(Path.of("./src/main/resources/data/team_players/team_players" + id + ".json"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private String readFromOtherFile(int id) {
-        try {
-            return Files.readString(Path.of("./src/main/resources/data/players/players" + id + ".json"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private PlayerDto convertToDto(Player player) {
-        return modelMapper.map(player, PlayerDto.class);
-    }
-
 }
