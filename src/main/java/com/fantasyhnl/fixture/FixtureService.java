@@ -44,25 +44,15 @@ public class FixtureService {
             var status = fixture.getStatus();
             var league = res.getLeague();
             var round = league.getRound();
-            var teams = res.getTeams();
-            var home = teams.getHome();
-            var away = teams.getAway();
-            var savedAwayTeamOpt = teamRepository.findById(away.getId());
-            var savedHomeTeamOpt = teamRepository.findById(home.getId());
-            if (savedAwayTeamOpt.isEmpty() || savedHomeTeamOpt.isEmpty()) continue;
-            var savedAwayTeam = savedAwayTeamOpt.get();
-            var savedHomeTeam = savedHomeTeamOpt.get();
-            home.setTeam(savedHomeTeam);
-            away.setTeam(savedAwayTeam);
-            home.setFixture(fixture);
-            away.setFixture(fixture);
-            teams.setFixture(fixture);
-            teams.setAway(away);
-            teams.setHome(home);
+            var goals = res.getGoals();
+
+            goals.setFixture(fixture);
             status.setFixture(fixture);
+
             fixture.setStatus(status);
             fixture.setRound(round);
-            fixture.setTeams(teams);
+            fixture.setGoals(goals);
+            setFixtureTeams(res);
             fixtureRepository.save(fixture);
         }
     }
@@ -109,5 +99,26 @@ public class FixtureService {
 
     private FixtureDto convertToDto(Fixture fixture) {
         return modelMapper.map(fixture, FixtureDto.class);
+    }
+
+    private void setFixtureTeams(FixtureResponse res) {
+        var fixture = res.getFixture();
+        var teams = res.getTeams();
+        var home = teams.getHome();
+        var away = teams.getAway();
+        var savedAwayTeamOpt = teamRepository.findById(away.getId());
+        var savedHomeTeamOpt = teamRepository.findById(home.getId());
+        if (savedAwayTeamOpt.isPresent() && savedHomeTeamOpt.isPresent()) {
+            var savedAwayTeam = savedAwayTeamOpt.get();
+            var savedHomeTeam = savedHomeTeamOpt.get();
+            home.setTeam(savedHomeTeam);
+            away.setTeam(savedAwayTeam);
+            home.setFixture(fixture);
+            away.setFixture(fixture);
+            teams.setFixture(fixture);
+            teams.setAway(away);
+            teams.setHome(home);
+            fixture.setTeams(teams);
+        }
     }
 }

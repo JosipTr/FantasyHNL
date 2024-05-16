@@ -1,5 +1,6 @@
 package com.fantasyhnl.fixture;
 
+import com.fantasyhnl.fixture.goals.Goals;
 import com.fantasyhnl.fixture.status.Status;
 import com.fantasyhnl.fixture.teams.TeamsDto;
 import lombok.Data;
@@ -16,4 +17,5 @@ public class FixtureDto {
     private Status status;
     private String round;
     private TeamsDto teams;
+    private Goals goals;
 }

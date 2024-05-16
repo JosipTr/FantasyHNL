@@ -1,5 +1,6 @@
 package com.fantasyhnl.fixture;
 
+import com.fantasyhnl.fixture.goals.Goals;
 import com.fantasyhnl.fixture.status.Status;
 import com.fantasyhnl.fixture.teams.Teams;
 import jakarta.persistence.CascadeType;
@@ -24,4 +25,6 @@ public class Fixture {
     private String round;
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "fixture")
     private Teams teams;
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "fixture")
+    private Goals goals;
 }
