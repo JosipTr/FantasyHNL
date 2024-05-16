@@ -18,7 +18,6 @@ public class Team {
     private int id;
     private String name;
     private String code;
-    private String country;
     private String founded;
     private String logo;
     @OneToMany(mappedBy = "team")
