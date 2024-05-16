@@ -5,9 +5,11 @@ import com.fantasyhnl.team.Team;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 @Data
 @Entity
+@ToString(exclude = "fixture")
 public class Home {
     @Id
     private int id;

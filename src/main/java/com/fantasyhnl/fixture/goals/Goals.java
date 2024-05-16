@@ -7,9 +7,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import lombok.Data;
+import lombok.ToString;
 
 @Entity
 @Data
+@ToString(exclude = "fixture")
 public class Goals {
     @Id
     private int id;
