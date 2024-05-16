@@ -1,10 +1,6 @@
 package com.fantasyhnl.player;
 
 import com.fantasyhnl.exception.EmptyListException;
-import com.fantasyhnl.player.statistic.Statistic;
-import com.fantasyhnl.player.statistic.cards.Cards;
-import com.fantasyhnl.player.statistic.goals.Goals;
-import com.fantasyhnl.player.statistic.penalty.Penalty;
 import com.fantasyhnl.team.TeamRepository;
 import com.fantasyhnl.util.JsonToObjectMapper;
 import com.fantasyhnl.util.RestService;
@@ -86,20 +82,6 @@ public class PlayerService {
                 for (var res : response) {
                     if (player.getId() == res.getPlayer().getId()) {
                         player.updatePlayer(res.getPlayer());
-                        var stats = res.getStatistics();
-                        for (var stat : stats) {
-                            var cards = stat.getCards();
-                            var penalty = stat.getPenalty();
-                            var goals = stat.getGoals();
-                            cards.setPlayer(player);
-                            penalty.setPlayer(player);
-                            goals.setPlayer(player);
-                            stat.setPlayer(player);
-                            stat.setCards(cards);
-                            stat.setGoals(goals);
-                            stat.setPenalty(penalty);
-                            player.setStatistic(stat);
-                        }
                     }
                 }
             }
@@ -117,10 +99,6 @@ public class PlayerService {
                 for (var res : response) {
                     if (player.getId() == res.getPlayer().getId()) {
                         player.updatePlayer(res.getPlayer());
-                        var stats = res.getStatistics();
-                        for (var stat : stats) {
-                            player.updateStatistic(stat);
-                        }
                     }
                 }
             }
