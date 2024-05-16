@@ -7,5 +7,4 @@ import java.util.ArrayList;
 @Data
 public class PlayerResponse {
     public Player player;
-//    public ArrayList<Statistic> statistics;
 }
