@@ -19,7 +19,7 @@ public class FixtureController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Fixture>> getFixtures() {
+    public ResponseEntity<List<FixtureDto>> getFixtures() {
         var fixtures = fixtureService.getFixtures();
         return ResponseEntity.ok(fixtures);
     }

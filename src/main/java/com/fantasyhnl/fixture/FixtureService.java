@@ -1,5 +1,8 @@
 package com.fantasyhnl.fixture;
 
+import com.fantasyhnl.player.Player;
+import com.fantasyhnl.player.PlayerDto;
+import com.fantasyhnl.team.TeamRepository;
 import com.fantasyhnl.util.JsonToObjectMapper;
 import com.fantasyhnl.util.RestService;
 import org.modelmapper.ModelMapper;
@@ -18,16 +21,18 @@ public class FixtureService {
     private final JsonToObjectMapper objectMapper;
     private final ModelMapper modelMapper;
     private final RestService restService;
+    private final TeamRepository teamRepository;
 
-    public FixtureService(FixtureRepository fixtureRepository, JsonToObjectMapper objectMapper, ModelMapper modelMapper, RestService restService) {
+    public FixtureService(FixtureRepository fixtureRepository, JsonToObjectMapper objectMapper, ModelMapper modelMapper, RestService restService, TeamRepository teamRepository) {
         this.fixtureRepository = fixtureRepository;
         this.objectMapper = objectMapper;
         this.modelMapper = modelMapper;
         this.restService = restService;
+        this.teamRepository = teamRepository;
     }
 
-    public List<Fixture> getFixtures() {
-        return fixtureRepository.findAll();
+    public List<FixtureDto> getFixtures() {
+        return fixtureRepository.findAll().stream().map(this::convertToDto).toList();
     }
 
     public void addFixtures() {
@@ -39,9 +44,25 @@ public class FixtureService {
             var status = fixture.getStatus();
             var league = res.getLeague();
             var round = league.getRound();
+            var teams = res.getTeams();
+            var home = teams.getHome();
+            var away = teams.getAway();
+            var savedAwayTeamOpt = teamRepository.findById(away.getId());
+            var savedHomeTeamOpt = teamRepository.findById(home.getId());
+            if (savedAwayTeamOpt.isEmpty() || savedHomeTeamOpt.isEmpty()) continue;
+            var savedAwayTeam = savedAwayTeamOpt.get();
+            var savedHomeTeam = savedHomeTeamOpt.get();
+            home.setTeam(savedHomeTeam);
+            away.setTeam(savedAwayTeam);
+            home.setFixture(fixture);
+            away.setFixture(fixture);
+            teams.setFixture(fixture);
+            teams.setAway(away);
+            teams.setHome(home);
             status.setFixture(fixture);
             fixture.setStatus(status);
             fixture.setRound(round);
+            fixture.setTeams(teams);
             fixtureRepository.save(fixture);
         }
     }
@@ -84,5 +105,9 @@ public class FixtureService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private FixtureDto convertToDto(Fixture fixture) {
+        return modelMapper.map(fixture, FixtureDto.class);
     }
 }
