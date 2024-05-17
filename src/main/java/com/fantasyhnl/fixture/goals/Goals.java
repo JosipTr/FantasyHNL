@@ -7,11 +7,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Entity
 @Data
 @ToString(exclude = "fixture")
+@EqualsAndHashCode(exclude = "fixture")
 public class Goals {
     @Id
     @JsonIgnore

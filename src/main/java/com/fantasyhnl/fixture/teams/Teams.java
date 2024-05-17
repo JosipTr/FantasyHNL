@@ -4,11 +4,13 @@ import com.fantasyhnl.fixture.Fixture;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Data
 @Entity
 @ToString(exclude = {"fixture"})
+@EqualsAndHashCode(exclude = "fixture")
 public class Teams {
     @Id
     private int id;

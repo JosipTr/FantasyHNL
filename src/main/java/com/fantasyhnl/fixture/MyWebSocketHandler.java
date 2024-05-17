@@ -7,7 +7,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 
-import java.io.IOException;
 import java.util.*;
 
 @Component
@@ -15,7 +14,7 @@ public class MyWebSocketHandler implements WebSocketHandler {
 
     private final BaseController<Fixture, FixtureDto> controller;
 
-    ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter().forType(FixtureDto.class);
+    ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 
     private final List<WebSocketSession> sessions = Collections.synchronizedList(new ArrayList<>());
 
@@ -24,11 +23,11 @@ public class MyWebSocketHandler implements WebSocketHandler {
     }
 
     @Scheduled(fixedRate = 5000)
-    public void sendDataToClients() {
+    private void sendDataToClients() {
         for (WebSocketSession session : sessions) {
             try {
-                var responseEntity = fetchFixtureFromDatabase();
-                var jsonData = ow.writeValueAsString(responseEntity);
+                var fixtures = filterFixtures();
+                var jsonData = ow.writeValueAsString(fixtures);
                 session.sendMessage(new TextMessage(jsonData));
             } catch (Exception e) {
                 // Handle exception
@@ -36,9 +35,24 @@ public class MyWebSocketHandler implements WebSocketHandler {
         }
     }
 
-    private FixtureDto fetchFixtureFromDatabase() {
-        var responseEntity = controller.getById(1034680);
+    private List<FixtureDto> fetchFixtures() {
+        var responseEntity = controller.getAll();
         return responseEntity.getBody();
+    }
+
+    private FixtureDto fetchFixtureById(int id) {
+        var responseEntity = controller.getById(id);
+        return responseEntity.getBody();
+    }
+
+    private List<FixtureDto> filterFixtures() {
+        var fixtures = fetchFixtures();
+        List<FixtureDto> fixtureDtos = new ArrayList<>(Collections.emptyList());
+        for (var fixture : fixtures) {
+            if (!fixture.getRound().equals("Regular Season - 35")) continue;
+            fixtureDtos.add(fixture);
+        }
+        return fixtureDtos;
     }
 
     @Override
