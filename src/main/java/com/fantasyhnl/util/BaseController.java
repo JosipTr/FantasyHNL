@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 public class BaseController<T, D> {
-    private final BaseService<T, D> baseService;
+    protected final BaseService<T, D> baseService;
 
     public BaseController(BaseService<T, D> baseService) {
         this.baseService = baseService;
