@@ -22,4 +22,8 @@ public class Away {
     @JsonIgnore
     @OneToOne
     private Fixture fixture;
+
+    public void setAway(Away away) {
+        setWinner(away.getWinner());
+    }
 }

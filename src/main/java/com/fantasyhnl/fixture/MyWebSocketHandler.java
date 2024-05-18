@@ -9,8 +9,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 
-import java.time.Instant;
+import java.time.*;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 @Component
@@ -20,38 +21,34 @@ public class MyWebSocketHandler implements WebSocketHandler {
     private static final Logger logger = LoggerFactory.getLogger(MyWebSocketHandler.class);
 
     private final ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-    private final List<WebSocketSession> sessions = Collections.synchronizedList(new ArrayList<>());
+    private final List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
 
     public MyWebSocketHandler(BaseController<Fixture, FixtureDto> controller) {
         this.controller = controller;
     }
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 180000)
     private void sendDataToClients() {
-        synchronized (sessions) {
-            for (WebSocketSession session : sessions) {
-                try {
-                    var fixtures = filterFixtures();
-                    checkDate(fixtures);
-                    var jsonData = ow.writeValueAsString(fixtures);
-                    session.sendMessage(new TextMessage(jsonData));
-                } catch (Exception e) {
-                    logger.error("Error sending data to client: {}", e.getMessage());
-                }
+        for (WebSocketSession session : sessions) {
+            try {
+                var fixtures = filterFixtures();
+                checkDate(fixtures);
+                var jsonData = ow.writeValueAsString(fixtures);
+                session.sendMessage(new TextMessage(jsonData));
+            } catch (Exception e) {
+                logger.error("Error sending data to client: {}", e.getMessage());
             }
         }
     }
 
     private void sendFixtureToClients() {
-        synchronized (sessions) {
-            for (WebSocketSession session : sessions) {
-                try {
-                    var fixtures = filterFixtures();
-                    var jsonData = ow.writeValueAsString(fixtures);
-                    session.sendMessage(new TextMessage(jsonData));
-                } catch (Exception e) {
-                    logger.error("Error sending fixture to client: {}", e.getMessage());
-                }
+        for (WebSocketSession session : sessions) {
+            try {
+                var fixtures = filterFixtures();
+                var jsonData = ow.writeValueAsString(fixtures);
+                session.sendMessage(new TextMessage(jsonData));
+            } catch (Exception e) {
+                logger.error("Error sending fixture to client: {}", e.getMessage());
             }
         }
     }
@@ -71,8 +68,24 @@ public class MyWebSocketHandler implements WebSocketHandler {
     }
 
     private List<FixtureDto> filterFixtures() {
-        return fetchFixtures().stream()
-                .filter(fixture -> "Regular Season - 1".equals(fixture.getRound()))
+        var myLocalDate = LocalDate.now(ZoneId.of("Europe/Zagreb"));
+        var fixtures = fetchFixtures().stream()
+                .sorted(Comparator.comparing(FixtureDto::getTimestamp))
+                .toList();
+
+        String round = fixtures.stream()
+                .filter(fixture -> {
+                    ZonedDateTime zonedDateTime = ZonedDateTime.parse(fixture.getDate());
+                    ZonedDateTime localZonedDateTime = zonedDateTime.withZoneSameInstant(ZoneId.of("Europe/Zagreb"));
+                    var localDate = localZonedDateTime.toLocalDate();
+                    return !myLocalDate.isAfter(localDate);
+                })
+                .findFirst()
+                .map(FixtureDto::getRound)
+                .orElse("");
+
+        return fixtures.stream()
+                .filter(fixture -> round.equals(fixture.getRound()))
                 .collect(Collectors.toList());
     }
 

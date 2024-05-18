@@ -35,6 +35,10 @@ public class Fixture {
         this.status.setStatus(status);
     }
 
+    public void updateTeams(Teams teams) {
+        this.teams.setTeams(teams);
+    }
+
     public void updateGoals(Goals goals) {
         this.goals.setGoals(goals);
     }

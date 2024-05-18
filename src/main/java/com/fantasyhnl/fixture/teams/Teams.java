@@ -22,4 +22,9 @@ public class Teams {
     @JsonIgnore
     @OneToOne
     private Fixture fixture;
+
+    public void setTeams(Teams teams) {
+        this.home.setHome(teams.getHome());
+        this.away.setAway(teams.getAway());
+    }
 }
