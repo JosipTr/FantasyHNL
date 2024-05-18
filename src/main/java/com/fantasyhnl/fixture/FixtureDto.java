@@ -14,7 +14,7 @@ public class FixtureDto {
     private int id;
     private String referee;
     private String timezone;
-    private Date date;
+    private String date;
     private Integer timestamp;
     private Status status;
     private String round;

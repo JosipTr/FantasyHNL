@@ -3,16 +3,24 @@ package com.fantasyhnl.fixture;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fantasyhnl.util.BaseController;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 @Component
 public class MyWebSocketHandler implements WebSocketHandler {
 
     private final BaseController<Fixture, FixtureDto> controller;
+    private static final Logger logger = LoggerFactory.getLogger(MyWebSocketHandler.class);
 
     ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 
@@ -22,8 +30,21 @@ public class MyWebSocketHandler implements WebSocketHandler {
         this.controller = controller;
     }
 
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 10000)
     private void sendDataToClients() {
+        for (WebSocketSession session : sessions) {
+            try {
+                var fixtures = filterFixtures();
+                checkDate(fixtures);
+                var jsonData = ow.writeValueAsString(fixtures);
+                session.sendMessage(new TextMessage(jsonData));
+            } catch (Exception e) {
+                // Handle exception
+            }
+        }
+    }
+
+    private void sentFixtureToClients() {
         for (WebSocketSession session : sessions) {
             try {
                 var fixtures = filterFixtures();
@@ -33,6 +54,10 @@ public class MyWebSocketHandler implements WebSocketHandler {
                 // Handle exception
             }
         }
+    }
+
+    private void updateFixture(int id) {
+        controller.updateById(id);
     }
 
     private List<FixtureDto> fetchFixtures() {
@@ -55,27 +80,51 @@ public class MyWebSocketHandler implements WebSocketHandler {
         return fixtureDtos;
     }
 
+    private void checkDate(List<FixtureDto> fixtures) {
+        for (var fixture : fixtures) {
+            var instant = Instant.now();
+            var localTimestamp = instant.getEpochSecond();  // Convert to Unix timestamp in seconds
+//            ZonedDateTime zonedDateTime = ZonedDateTime.parse(date);
+//            ZonedDateTime localZonedDateTime = zonedDateTime.withZoneSameInstant(ZoneId.of("Europe/Zagreb"));
+//            LocalDateTime localDateTime = localZonedDateTime.toLocalDateTime();
+
+            var startTimestamp = fixture.getTimestamp();
+            var halfTimestamp = startTimestamp + (46 * 60);
+            var pauseTimestamp = halfTimestamp + (16 * 60);
+            var fullTimestamp = halfTimestamp + (46 * 60);
+            logger.info("Timestamp {}", halfTimestamp);
+            logger.info("PRIJE");
+            if (localTimestamp >= halfTimestamp && localTimestamp <= pauseTimestamp) continue;
+            if ((localTimestamp >= startTimestamp && localTimestamp <= halfTimestamp) || (localTimestamp >= halfTimestamp && localTimestamp <= fullTimestamp)) {
+                logger.info("DADADADADA");
+                updateFixture(fixture.getId());
+                logger.info("Updated");
+            }
+        }
+    }
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        System.out.println("WebSocket connection established");
+        logger.info("WebSocket connection established");
         sessions.add(session);
+        sentFixtureToClients();
         session.sendMessage(new TextMessage("Hello, client! Welcome to the WebSocket server."));
     }
 
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
-        System.out.println("Received message: " + message.getPayload());
+        logger.info("Received message: {}", message.getPayload());
         session.sendMessage(new TextMessage("Hello, client!"));
     }
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-        System.err.println("WebSocket transport error: " + exception.getMessage());
+        logger.info("WebSocket transport error: {}", exception.getMessage());
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-        System.out.println("WebSocket connection closed");
+        logger.info("WebSocket connection closed");
     }
 
     @Override

@@ -19,7 +19,7 @@ public class Fixture {
     private int id;
     private String referee;
     private String timezone;
-    private Date date;
+    private String date;
     private int timestamp;
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "fixture")
     private Status status;
