@@ -1,11 +1,9 @@
 package com.fantasyhnl.fixture.statistic.card;
 
 import com.fantasyhnl.fixture.statistic.Statistic;
+import com.fantasyhnl.fixture.statistic.StatisticId;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -15,8 +13,9 @@ import lombok.ToString;
 @ToString(exclude = "statistic")
 @EqualsAndHashCode(exclude = "statistic")
 public class Card {
-    @Id
-    private int id;
+    @EmbeddedId
+    @JsonIgnore
+    private StatisticId id;
     private Integer yellow;
     private Integer red;
     @MapsId

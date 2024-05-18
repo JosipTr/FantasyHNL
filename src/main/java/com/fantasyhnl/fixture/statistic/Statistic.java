@@ -17,8 +17,9 @@ import lombok.ToString;
 @ToString(exclude = {"fixture", "player"})
 @EqualsAndHashCode(exclude = {"fixture", "player"})
 public class Statistic {
-    @Id
-    private int id;
+    @EmbeddedId
+    @JsonIgnore
+    private StatisticId id;
     private Integer minutes;
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "statistic")
     private Game games;
@@ -28,12 +29,16 @@ public class Statistic {
     private Card cards;
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "statistic")
     private Penalty penalty;
-    @MapsId
+    @MapsId("fixtureId")
     @OneToOne
     @JsonIgnore
     private Fixture fixture;
-    @MapsId
+    @MapsId("playerId")
     @OneToOne
     @JsonIgnore
     private Player player;
+
+    public Statistic() {
+        this.id = new StatisticId();
+    }
 }

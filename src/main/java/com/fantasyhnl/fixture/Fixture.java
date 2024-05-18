@@ -2,6 +2,7 @@ package com.fantasyhnl.fixture;
 
 import com.fantasyhnl.fixture.event.Event;
 import com.fantasyhnl.fixture.goals.Goals;
+import com.fantasyhnl.fixture.statistic.Statistic;
 import com.fantasyhnl.fixture.status.Status;
 import com.fantasyhnl.fixture.teams.Teams;
 import jakarta.persistence.*;
@@ -30,6 +31,8 @@ public class Fixture {
     private Goals goals;
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "fixture", fetch = FetchType.EAGER)
     private Set<Event> events = new HashSet<>();
+//    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "fixture", fetch = FetchType.EAGER)
+//    private Set<Statistic> statistics = new HashSet<>();
 
     public void updateStatus(Status status) {
         this.status.setStatus(status);
@@ -46,6 +49,10 @@ public class Fixture {
     public void addEvent(Event event) {
         this.events.add(event);
     }
+
+//    public void addStatistic(Statistic statistic) {
+//        this.statistics.add(statistic);
+//    }
 
     public void removeEvents() {
         Set<Event> tmp = new HashSet<>(this.events);

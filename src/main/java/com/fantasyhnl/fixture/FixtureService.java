@@ -62,6 +62,14 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
                 var fixtureOpt = baseRepository.findById(fixtureId);
                 if (fixtureOpt.isEmpty()) continue;
                 var fixture = fixtureOpt.get();
+                var goals = res.getGoals();
+                var referee = res.getFixture().getReferee();
+                var status = res.getFixture().getStatus();
+                var teams = res.getTeams();
+                fixture.updateTeams(teams);
+                fixture.updateStatus(status);
+                fixture.updateGoals(goals);
+                fixture.setReferee(referee);
                 setFixtureEvents(res, fixture);
             }
         }
@@ -111,6 +119,7 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
             fix.updateGoals(goals);
             fix.setReferee(referee);
             setFixtureEvents(res, fix);
+            setPlayerStatistic(res, fix);
         }
     }
 
@@ -159,6 +168,39 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
             event.setFixture(fixture);
             event.setTime(time);
             fixture.addEvent(event);
+        }
+    }
+
+    private void setPlayerStatistic(FixtureResponse res, Fixture fixture) {
+        // Get player statistic
+        var statisticResponses = res.getPlayers();
+        if (statisticResponses == null) return;
+        for (var statResponse : statisticResponses) {
+            var statPlayerResponses = statResponse.getPlayers();
+            for (var statPlayerResponse : statPlayerResponses) {
+                var play = statPlayerResponse.getPlayer();
+                var savedPlayerOpt = playerRepository.findById(play.getId());
+                if (savedPlayerOpt.isEmpty()) continue;
+                var player = savedPlayerOpt.get();
+                var statistics = statPlayerResponse.getStatistics();
+                for (var stat : statistics) {
+                    var games = stat.getGames();
+                    var goals = stat.getGoals();
+                    var cards = stat.getCards();
+                    var penalty = stat.getPenalty();
+                    games.setStatistic(stat);
+                    goals.setStatistic(stat);
+                    cards.setStatistic(stat);
+                    penalty.setStatistic(stat);
+                    stat.setGames(games);
+                    stat.setGoals(goals);
+                    stat.setCards(cards);
+                    stat.setPenalty(penalty);
+                    stat.setFixture(fixture);
+                    stat.setPlayer(player);
+                    player.addStatistic(stat);
+                }
+            }
         }
     }
 
