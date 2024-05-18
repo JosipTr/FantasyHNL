@@ -1,6 +1,7 @@
 package com.fantasyhnl.fixture;
 
 import com.fantasyhnl.fixture.league.League;
+import com.fantasyhnl.fixture.statistic.StatisticResponse;
 import com.fantasyhnl.fixture.teams.Teams;
 import com.fantasyhnl.fixture.goals.Goals;
 import com.fantasyhnl.fixture.event.Event;
@@ -18,5 +19,5 @@ public class FixtureResponse {
     private ArrayList<Event> events;
 //    private ArrayList<Lineup> lineups;
 //    private ArrayList<Statistic> statistics;
-//    private ArrayList<Player> players;
+    private ArrayList<StatisticResponse> players;
 }
