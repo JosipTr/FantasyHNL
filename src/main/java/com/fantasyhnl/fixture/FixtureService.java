@@ -67,46 +67,52 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
         }
     }
 
-//    @Transactional
-//    @Override
-//    public void updateById(int id) {
-//        var fixtureOpt = baseRepository.findById(id);
-//        if (fixtureOpt.isEmpty()) throw new InvalidIdException("Invalid ID");
-//        var fix = fixtureOpt.get();
-//        var url = fixtureDetailPath + fix.getId() + ".json";
-//        var body = readFromFile(url);
-//        var root = objectMapper.mapToRootObject(body, FixtureResponse.class);
-//        var response = root.getResponse();
-//        fix.removeEvents();
-//        for (var res : response) {
-//            var goals = res.getGoals();
-//            var g = fix.getGoals();
-//            g.setGoals(goals);
-//            fix.setGoals(g);
-//            setFixtureEvents(res, fix);
-//        }
-//    }
-
     @Transactional
     @Override
     public void updateById(int id) {
         var fixtureOpt = baseRepository.findById(id);
         if (fixtureOpt.isEmpty()) throw new InvalidIdException("Invalid ID");
         var fix = fixtureOpt.get();
-//        var url = detailedFixture + fix.getId() + ".json";
-//        var body = readFromFile(url);
-        var body = restService.getResponseBody(detailedFixture + fix.getId());
+        var url = fixtureDetailPath + fix.getId() + ".json";
+        var body = readFromFile(url);
         var root = objectMapper.mapToRootObject(body, FixtureResponse.class);
         var response = root.getResponse();
         fix.removeEvents();
         for (var res : response) {
             var goals = res.getGoals();
-            var g = fix.getGoals();
-            g.setGoals(goals);
-            fix.setGoals(g);
+            var referee = res.getFixture().getReferee();
+            var status = res.getFixture().getStatus();
+            fix.updateStatus(status);
+            fix.updateGoals(goals);
+            fix.setReferee(referee);
             setFixtureEvents(res, fix);
         }
     }
+
+//    @Transactional
+//    @Override
+//    public void updateById(int id) {
+//        var fixtureOpt = baseRepository.findById(id);
+//        if (fixtureOpt.isEmpty()) throw new InvalidIdException("Invalid ID");
+//        var fix = fixtureOpt.get();
+////        var url = detailedFixture + fix.getId() + ".json";
+////        var body = readFromFile(url);
+//        var body = restService.getResponseBody(detailedFixture + fix.getId());
+//        var root = objectMapper.mapToRootObject(body, FixtureResponse.class);
+//        var response = root.getResponse();
+//        fix.removeEvents();
+//        for (var res : response) {
+//            var goals = res.getGoals();
+//            var g = fix.getGoals();
+//            var referee = fix.getReferee();
+//            var status = fix.getStatus();
+//            fix.setStatus(status);
+//            g.setGoals(goals);
+//            fix.setGoals(g);
+//            fix.setReferee(referee);
+//            setFixtureEvents(res, fix);
+//        }
+//    }
 
     private void setFixtureTeams(FixtureResponse res) {
         var fixture = res.getFixture();

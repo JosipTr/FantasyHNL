@@ -28,4 +28,10 @@ public class Status {
     @MapsId
     @JsonIgnore
     private Fixture fixture;
+
+    public void setStatus(Status status) {
+        setMyLong(status.getMyLong());
+        setMyShort(status.getMyShort());
+        setElapsed(status.getElapsed());
+    }
 }

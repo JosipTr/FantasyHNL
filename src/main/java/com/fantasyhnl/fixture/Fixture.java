@@ -31,6 +31,14 @@ public class Fixture {
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "fixture", fetch = FetchType.EAGER)
     private Set<Event> events = new HashSet<>();
 
+    public void updateStatus(Status status) {
+        this.status.setStatus(status);
+    }
+
+    public void updateGoals(Goals goals) {
+        this.goals.setGoals(goals);
+    }
+
     public void addEvent(Event event) {
         this.events.add(event);
     }

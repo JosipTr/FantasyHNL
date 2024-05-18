@@ -9,12 +9,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 
-import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class MyWebSocketHandler implements WebSocketHandler {
@@ -22,8 +19,7 @@ public class MyWebSocketHandler implements WebSocketHandler {
     private final BaseController<Fixture, FixtureDto> controller;
     private static final Logger logger = LoggerFactory.getLogger(MyWebSocketHandler.class);
 
-    ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-
+    private final ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
     private final List<WebSocketSession> sessions = Collections.synchronizedList(new ArrayList<>());
 
     public MyWebSocketHandler(BaseController<Fixture, FixtureDto> controller) {
@@ -32,32 +28,41 @@ public class MyWebSocketHandler implements WebSocketHandler {
 
     @Scheduled(fixedRate = 10000)
     private void sendDataToClients() {
-        for (WebSocketSession session : sessions) {
-            try {
-                var fixtures = filterFixtures();
-                checkDate(fixtures);
-                var jsonData = ow.writeValueAsString(fixtures);
-                session.sendMessage(new TextMessage(jsonData));
-            } catch (Exception e) {
-                // Handle exception
+        synchronized (sessions) {
+            for (WebSocketSession session : sessions) {
+                try {
+                    var fixtures = filterFixtures();
+                    checkDate(fixtures);
+                    var jsonData = ow.writeValueAsString(fixtures);
+                    session.sendMessage(new TextMessage(jsonData));
+                } catch (Exception e) {
+                    logger.error("Error sending data to client: {}", e.getMessage());
+                }
             }
         }
     }
 
-    private void sentFixtureToClients() {
-        for (WebSocketSession session : sessions) {
-            try {
-                var fixtures = filterFixtures();
-                var jsonData = ow.writeValueAsString(fixtures);
-                session.sendMessage(new TextMessage(jsonData));
-            } catch (Exception e) {
-                // Handle exception
+    private void sendFixtureToClients() {
+        synchronized (sessions) {
+            for (WebSocketSession session : sessions) {
+                try {
+                    var fixtures = filterFixtures();
+                    var jsonData = ow.writeValueAsString(fixtures);
+                    session.sendMessage(new TextMessage(jsonData));
+                } catch (Exception e) {
+                    logger.error("Error sending fixture to client: {}", e.getMessage());
+                }
             }
         }
     }
 
     private void updateFixture(int id) {
-        controller.updateById(id);
+        try {
+            controller.updateById(id);
+            logger.info("Updated fixture with ID: {}", id);
+        } catch (Exception e) {
+            logger.error("Error updating fixture with ID {}: {}", id, e.getMessage());
+        }
     }
 
     private List<FixtureDto> fetchFixtures() {
@@ -65,40 +70,26 @@ public class MyWebSocketHandler implements WebSocketHandler {
         return responseEntity.getBody();
     }
 
-    private FixtureDto fetchFixtureById(int id) {
-        var responseEntity = controller.getById(id);
-        return responseEntity.getBody();
-    }
-
     private List<FixtureDto> filterFixtures() {
-        var fixtures = fetchFixtures();
-        List<FixtureDto> fixtureDtos = new ArrayList<>(Collections.emptyList());
-        for (var fixture : fixtures) {
-            if (!fixture.getRound().equals("Regular Season - 35")) continue;
-            fixtureDtos.add(fixture);
-        }
-        return fixtureDtos;
+        return fetchFixtures().stream()
+                .filter(fixture -> "Regular Season - 1".equals(fixture.getRound()))
+                .collect(Collectors.toList());
     }
 
     private void checkDate(List<FixtureDto> fixtures) {
-        for (var fixture : fixtures) {
-            var instant = Instant.now();
-            var localTimestamp = instant.getEpochSecond();  // Convert to Unix timestamp in seconds
-//            ZonedDateTime zonedDateTime = ZonedDateTime.parse(date);
-//            ZonedDateTime localZonedDateTime = zonedDateTime.withZoneSameInstant(ZoneId.of("Europe/Zagreb"));
-//            LocalDateTime localDateTime = localZonedDateTime.toLocalDateTime();
+        var currentTimestamp = (int) Instant.now().getEpochSecond();
 
-            var startTimestamp = fixture.getTimestamp();
-            var halfTimestamp = startTimestamp + (46 * 60);
+        for (var fixture : fixtures) {
+            var fixtureTimestamp = (int) fixture.getTimestamp();
+            var halfTimestamp = fixtureTimestamp + (46 * 60);
             var pauseTimestamp = halfTimestamp + (16 * 60);
             var fullTimestamp = halfTimestamp + (46 * 60);
-            logger.info("Timestamp {}", halfTimestamp);
-            logger.info("PRIJE");
-            if (localTimestamp >= halfTimestamp && localTimestamp <= pauseTimestamp) continue;
-            if ((localTimestamp >= startTimestamp && localTimestamp <= halfTimestamp) || (localTimestamp >= halfTimestamp && localTimestamp <= fullTimestamp)) {
-                logger.info("DADADADADA");
+
+            if (currentTimestamp >= halfTimestamp && currentTimestamp <= pauseTimestamp) continue;
+
+            if ((currentTimestamp >= fixtureTimestamp && currentTimestamp <= halfTimestamp) ||
+                    (currentTimestamp >= halfTimestamp && currentTimestamp <= fullTimestamp)) {
                 updateFixture(fixture.getId());
-                logger.info("Updated");
             }
         }
     }
@@ -107,7 +98,7 @@ public class MyWebSocketHandler implements WebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         logger.info("WebSocket connection established");
         sessions.add(session);
-        sentFixtureToClients();
+        sendFixtureToClients();
         session.sendMessage(new TextMessage("Hello, client! Welcome to the WebSocket server."));
     }
 
@@ -119,12 +110,13 @@ public class MyWebSocketHandler implements WebSocketHandler {
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-        logger.info("WebSocket transport error: {}", exception.getMessage());
+        logger.error("WebSocket transport error: {}", exception.getMessage());
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
         logger.info("WebSocket connection closed");
+        sessions.remove(session);
     }
 
     @Override
