@@ -11,6 +11,9 @@ import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static com.fantasyhnl.util.Constants.*;
 
 @Service
@@ -43,59 +46,30 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
             fixture.setRound(round);
             fixture.setGoals(goals);
             setFixtureTeams(res);
-            baseRepository.save(fixture);
+            var savedFixture = baseRepository.save(fixture);
+            if (savedFixture.getId() < 1034786) {
+                addStatistic(savedFixture);
+            }
         }
     }
 
     @Override
     @Transactional
     public void update() {
-        var fixtures = baseRepository.findAll();
-        for (var fix : fixtures) {
-            if (fix.getId() >= 1034786) break;
-            var url = fixtureDetailPath + fix.getId() + ".json";
-            var body = readFromFile(url);
-            var root = objectMapper.mapToRootObject(body, FixtureResponse.class);
-            var response = root.getResponse();
+        var fixtures = baseRepository.findAll().stream()
+                .filter(fix -> fix.getId() < 1034786)
+                .toList();
+
+        for (var fixture : fixtures) {
+            var response = getFixtureResponse(fixture);
+            fixture.removeEvents();
             for (var res : response) {
-                var fixtureId = res.getFixture().getId();
-                var fixtureOpt = baseRepository.findById(fixtureId);
-                if (fixtureOpt.isEmpty()) continue;
-                var fixture = fixtureOpt.get();
-                var goals = res.getGoals();
-                var referee = res.getFixture().getReferee();
-                var status = res.getFixture().getStatus();
-                var teams = res.getTeams();
-                fixture.updateTeams(teams);
-                fixture.updateStatus(status);
-                fixture.updateGoals(goals);
-                fixture.setReferee(referee);
+                updateFixture(res, fixture);
                 setFixtureEvents(res, fixture);
             }
         }
     }
 
-//    @Transactional
-//    @Override
-//    public void updateById(int id) {
-//        var fixtureOpt = baseRepository.findById(id);
-//        if (fixtureOpt.isEmpty()) throw new InvalidIdException("Invalid ID");
-//        var fix = fixtureOpt.get();
-//        var url = fixtureDetailPath + fix.getId() + ".json";
-//        var body = readFromFile(url);
-//        var root = objectMapper.mapToRootObject(body, FixtureResponse.class);
-//        var response = root.getResponse();
-//        fix.removeEvents();
-//        for (var res : response) {
-//            var goals = res.getGoals();
-//            var referee = res.getFixture().getReferee();
-//            var status = res.getFixture().getStatus();
-//            fix.updateStatus(status);
-//            fix.updateGoals(goals);
-//            fix.setReferee(referee);
-//            setFixtureEvents(res, fix);
-//        }
-//    }
 
     @Transactional
     @Override
@@ -103,23 +77,12 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
         var fixtureOpt = baseRepository.findById(id);
         if (fixtureOpt.isEmpty()) throw new InvalidIdException("Invalid ID");
         var fix = fixtureOpt.get();
-//        var url = detailedFixture + fix.getId() + ".json";
-//        var body = readFromFile(url);
-        var body = restService.getResponseBody(detailedFixture + fix.getId());
-        var root = objectMapper.mapToRootObject(body, FixtureResponse.class);
-        var response = root.getResponse();
+        var response = getFixtureResponse(fix);
         fix.removeEvents();
         for (var res : response) {
-            var goals = res.getGoals();
-            var referee = res.getFixture().getReferee();
-            var status = res.getFixture().getStatus();
-            var teams = res.getTeams();
-            fix.updateTeams(teams);
-            fix.updateStatus(status);
-            fix.updateGoals(goals);
-            fix.setReferee(referee);
+            updateFixture(res, fix);
             setFixtureEvents(res, fix);
-            setPlayerStatistic(res, fix);
+//            setPlayerStatistic(res, fix);
         }
     }
 
@@ -153,15 +116,15 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
             var playerId = event.getPlayer().getId();
             var assistPlayerId = event.getAssist().getId();
 
-            var player = playerRepository.findById(playerId);
-            var assistPlayer = playerRepository.findById(assistPlayerId);
+            var playerOpt = playerRepository.findById(playerId);
+            var assistPlayerOpt = playerRepository.findById(assistPlayerId);
             var team = teamRepository.findById(teamId);
 
-            if (assistPlayer.isEmpty() || player.isEmpty()) continue;
-            var assistPlayerP = assistPlayer.get();
-            var playerp = player.get();
-            event.setPlayer(playerp);
-            event.setAssist(assistPlayerP);
+            if (assistPlayerOpt.isEmpty() || playerOpt.isEmpty()) continue;
+            var assistPlayer = assistPlayerOpt.get();
+            var player = playerOpt.get();
+            event.setPlayer(player);
+            event.setAssist(assistPlayer);
             team.ifPresent(event::setTeam);
 
             time.setFixture(fixture);
@@ -202,6 +165,39 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
                 }
             }
         }
+    }
+
+    private void addStatistic(Fixture fixture) {
+        var response = getFixtureResponse(fixture);
+        for (var res : response) {
+            setFixtureEvents(res, fixture);
+        }
+    }
+
+    private void addEventStatistic(Fixture fixture) {
+        var response = getFixtureResponse(fixture);
+        for (var res : response) {
+            setFixtureEvents(res, fixture);
+            setPlayerStatistic(res, fixture);
+        }
+    }
+
+    private void updateFixture(FixtureResponse res, Fixture fixture) {
+        var goals = res.getGoals();
+        var referee = res.getFixture().getReferee();
+        var status = res.getFixture().getStatus();
+        var teams = res.getTeams();
+        fixture.updateTeams(teams);
+        fixture.updateStatus(status);
+        fixture.updateGoals(goals);
+        fixture.setReferee(referee);
+    }
+
+    private List<FixtureResponse> getFixtureResponse(Fixture fixture) {
+        var url = fixtureDetailPath + fixture.getId() + ".json";
+        var body = readFromFile(url);
+        var root = objectMapper.mapToRootObject(body, FixtureResponse.class);
+        return root.getResponse();
     }
 
     @Override
