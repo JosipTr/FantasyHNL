@@ -7,6 +7,7 @@ import com.fantasyhnl.fixture.status.Status;
 import com.fantasyhnl.fixture.teams.Teams;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -30,6 +31,7 @@ public class Fixture {
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "fixture")
     private Goals goals;
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "fixture", fetch = FetchType.LAZY)
+    @BatchSize(size = 10)
     private Set<Event> events = new HashSet<>();
 //    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "fixture", fetch = FetchType.EAGER)
 //    private Set<Statistic> statistics = new HashSet<>();

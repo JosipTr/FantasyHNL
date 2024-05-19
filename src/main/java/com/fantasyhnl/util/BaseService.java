@@ -3,6 +3,8 @@ package com.fantasyhnl.util;
 import com.fantasyhnl.exception.EmptyListException;
 import com.fantasyhnl.exception.InvalidIdException;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.FileWriter;
@@ -34,6 +36,7 @@ public abstract class BaseService<T, D> {
         throw new InvalidIdException("Invalid ID");
     }
 
+    @Cacheable("fixtures")
     protected List<D> getAll() {
         var results = baseRepository.findAll();
         if (results.isEmpty()) throw new EmptyListException(emptyList);
