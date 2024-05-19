@@ -34,18 +34,10 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
         var response = root.getResponse();
         for (var res : response) {
             var fixture = res.getFixture();
-            var status = fixture.getStatus();
-            var league = res.getLeague();
-            var round = league.getRound();
-            var goals = res.getGoals();
 
-            goals.setFixture(fixture);
-            status.setFixture(fixture);
-
-            fixture.setStatus(status);
-            fixture.setRound(round);
-            fixture.setGoals(goals);
+            fixture.setFixture(res);
             setFixtureTeams(res);
+
             var savedFixture = baseRepository.save(fixture);
             if (savedFixture.getId() < 1034786) {
                 addStatistic(savedFixture);

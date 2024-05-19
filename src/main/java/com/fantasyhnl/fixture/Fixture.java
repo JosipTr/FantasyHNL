@@ -5,6 +5,7 @@ import com.fantasyhnl.fixture.goals.Goals;
 import com.fantasyhnl.fixture.statistic.Statistic;
 import com.fantasyhnl.fixture.status.Status;
 import com.fantasyhnl.fixture.teams.Teams;
+import com.fantasyhnl.team.Team;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.BatchSize;
@@ -36,6 +37,20 @@ public class Fixture {
 //    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "fixture", fetch = FetchType.EAGER)
 //    private Set<Statistic> statistics = new HashSet<>();
 
+    public void setFixture(FixtureResponse response) {
+        var status = response.getFixture().getStatus();
+        var goals = response.getGoals();
+        goals.setFixture(this);
+        status.setFixture(this);
+        setReferee(response.getFixture().getReferee());
+        setTimezone(response.getFixture().getTimezone());
+        setDate(response.getFixture().getDate());
+        setTimestamp(response.getFixture().getTimestamp());
+        setRound(response.getLeague().getRound());
+
+        setStatus(status);
+        setGoals(goals);
+    }
 
     public void updateFixture(FixtureResponse response) {
         setReferee(response.getFixture().getReferee());
@@ -46,18 +61,6 @@ public class Fixture {
         this.status.setStatus(response.getFixture().getStatus());
         this.teams.setTeams(response.getTeams());
         this.goals.setGoals(response.getGoals());
-    }
-
-    public void updateStatus(Status status) {
-        this.status.setStatus(status);
-    }
-
-    public void updateTeams(Teams teams) {
-        this.teams.setTeams(teams);
-    }
-
-    public void updateGoals(Goals goals) {
-        this.goals.setGoals(goals);
     }
 
     public void addEvent(Event event) {
