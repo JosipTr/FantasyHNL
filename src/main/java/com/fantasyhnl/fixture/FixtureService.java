@@ -48,34 +48,36 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
     @Override
     @Transactional
     public void update() {
-        var fixtures = baseRepository.findAll().stream()
+        baseRepository.findAll().stream()
                 .filter(fix -> fix.getId() < 1034786)
-                .toList();
-
-        for (var fixture : fixtures) {
-            var response = getFixtureResponse(fixture);
-            fixture.removeEvents();
-            for (var res : response) {
-                fixture.updateFixture(res);
-                setFixtureEvents(res, fixture);
-            }
-        }
+                .toList().forEach(fixture -> {
+                    var response = getFixtureResponse(fixture);
+                    fixture.removeEvents();
+                    for (var res : response) {
+                        fixture.updateFixture(res);
+                        setFixtureEvents(res, fixture);
+                    }
+                });
     }
 
 
     @Transactional
     @Override
     public void updateById(int id) {
-        var fixtureOpt = baseRepository.findById(id);
-        if (fixtureOpt.isEmpty()) throw new InvalidIdException("Invalid ID");
-        var fixture = fixtureOpt.get();
-        var response = getFixtureResponse(fixture);
-        fixture.removeEvents();
-        for (var res : response) {
-            fixture.updateFixture(res);
-            setFixtureEvents(res, fixture);
+        baseRepository.findById(id).ifPresentOrElse(
+                fixture -> {
+                    var response = getFixtureResponse(fixture);
+                    fixture.removeEvents();
+                    for (var res : response) {
+                        fixture.updateFixture(res);
+                        setFixtureEvents(res, fixture);
 //            setPlayerStatistic(res, fix);
-        }
+                    }
+                }, () -> {
+                    throw new InvalidIdException("");
+                }
+        );
+
     }
 
     private void setFixtureTeams(FixtureResponse res) {
