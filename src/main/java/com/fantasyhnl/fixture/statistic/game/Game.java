@@ -21,4 +21,8 @@ public class Game {
     @OneToOne
     @JsonIgnore
     private Statistic statistic;
+
+    public void setGame(Game game) {
+        setMinutes(game.getMinutes());
+    }
 }

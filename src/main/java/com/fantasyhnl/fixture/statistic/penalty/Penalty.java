@@ -15,7 +15,7 @@ import lombok.ToString;
 public class Penalty {
     @EmbeddedId
     @JsonIgnore
-    private StatisticId id = new StatisticId();
+    private StatisticId id;
     private Integer total;
     private Integer conceded;
     private Integer assists;
@@ -24,4 +24,11 @@ public class Penalty {
     @OneToOne
     @JsonIgnore
     private Statistic statistic;
+
+    public void setPenalty(Penalty penalty) {
+        setTotal(penalty.getTotal());
+        setConceded(penalty.getConceded());
+        setAssists(penalty.getAssists());
+        setSaves(penalty.getSaves());
+    }
 }

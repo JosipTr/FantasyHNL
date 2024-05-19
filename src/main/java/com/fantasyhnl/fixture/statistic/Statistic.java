@@ -20,7 +20,6 @@ public class Statistic {
     @EmbeddedId
     @JsonIgnore
     private StatisticId id;
-    private Integer minutes;
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "statistic")
     private Game games;
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "statistic")
@@ -40,5 +39,12 @@ public class Statistic {
 
     public Statistic() {
         this.id = new StatisticId();
+    }
+
+    public void setStatistic(Statistic statistic) {
+        this.games.setGame(statistic.getGames());
+        this.goals.setGoal(statistic.getGoals());
+        this.cards.setCard(statistic.getCards());
+        this.penalty.setPenalty(statistic.getPenalty());
     }
 }
