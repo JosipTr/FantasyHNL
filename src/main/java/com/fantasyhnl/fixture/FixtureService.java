@@ -104,28 +104,28 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
     private void setFixtureEvents(FixtureResponse res, Fixture fixture) {
         var events = res.getEvents();
         if (events == null) return;
-        for (var event : events) {
-            var time = event.getTime();
+        events.forEach(event -> {
             var teamId = event.getTeam().getId();
             var playerId = event.getPlayer().getId();
             var assistPlayerId = event.getAssist().getId();
 
             var playerOpt = playerRepository.findById(playerId);
             var assistPlayerOpt = playerRepository.findById(assistPlayerId);
-            var team = teamRepository.findById(teamId);
+            var teamOpt = teamRepository.findById(teamId);
 
-            if (assistPlayerOpt.isEmpty() || playerOpt.isEmpty()) continue;
-            var assistPlayer = assistPlayerOpt.get();
-            var player = playerOpt.get();
-            event.setPlayer(player);
-            event.setAssist(assistPlayer);
-            team.ifPresent(event::setTeam);
+            if (playerOpt.isPresent() && assistPlayerOpt.isPresent() && teamOpt.isPresent()) {
+                var time = event.getTime();
 
-            time.setFixture(fixture);
-            event.setFixture(fixture);
-            event.setTime(time);
-            fixture.addEvent(event);
-        }
+                time.setFixture(fixture);
+                event.setPlayer(playerOpt.get());
+                event.setAssist(assistPlayerOpt.get());
+                event.setTeam(teamOpt.get());
+                event.setFixture(fixture);
+                event.setTime(time);
+
+                fixture.addEvent(event);
+            }
+        });
     }
 
     private void setPlayerStatistic(FixtureResponse res, Fixture fixture) {
