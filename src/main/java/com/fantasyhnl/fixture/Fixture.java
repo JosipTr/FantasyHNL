@@ -36,6 +36,18 @@ public class Fixture {
 //    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "fixture", fetch = FetchType.EAGER)
 //    private Set<Statistic> statistics = new HashSet<>();
 
+
+    public void updateFixture(FixtureResponse response) {
+        setReferee(response.getFixture().getReferee());
+        setTimezone(response.getFixture().getTimezone());
+        setDate(response.getFixture().getDate());
+        setTimestamp(response.getFixture().getTimestamp());
+        setRound(response.getLeague().getRound());
+        this.status.setStatus(response.getFixture().getStatus());
+        this.teams.setTeams(response.getTeams());
+        this.goals.setGoals(response.getGoals());
+    }
+
     public void updateStatus(Status status) {
         this.status.setStatus(status);
     }

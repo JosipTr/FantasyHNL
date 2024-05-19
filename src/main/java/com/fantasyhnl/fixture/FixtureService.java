@@ -64,7 +64,7 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
             var response = getFixtureResponse(fixture);
             fixture.removeEvents();
             for (var res : response) {
-                updateFixture(res, fixture);
+                fixture.updateFixture(res);
                 setFixtureEvents(res, fixture);
             }
         }
@@ -76,12 +76,12 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
     public void updateById(int id) {
         var fixtureOpt = baseRepository.findById(id);
         if (fixtureOpt.isEmpty()) throw new InvalidIdException("Invalid ID");
-        var fix = fixtureOpt.get();
-        var response = getFixtureResponse(fix);
-        fix.removeEvents();
+        var fixture = fixtureOpt.get();
+        var response = getFixtureResponse(fixture);
+        fixture.removeEvents();
         for (var res : response) {
-            updateFixture(res, fix);
-            setFixtureEvents(res, fix);
+            fixture.updateFixture(res);
+            setFixtureEvents(res, fixture);
 //            setPlayerStatistic(res, fix);
         }
     }
@@ -180,17 +180,6 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
             setFixtureEvents(res, fixture);
             setPlayerStatistic(res, fixture);
         }
-    }
-
-    private void updateFixture(FixtureResponse res, Fixture fixture) {
-        var goals = res.getGoals();
-        var referee = res.getFixture().getReferee();
-        var status = res.getFixture().getStatus();
-        var teams = res.getTeams();
-        fixture.updateTeams(teams);
-        fixture.updateStatus(status);
-        fixture.updateGoals(goals);
-        fixture.setReferee(referee);
     }
 
     private List<FixtureResponse> getFixtureResponse(Fixture fixture) {
