@@ -1,6 +1,7 @@
 package com.fantasyhnl.fixture;
 
 import com.fantasyhnl.exception.InvalidIdException;
+import com.fantasyhnl.fixture.statistic.StatisticId;
 import com.fantasyhnl.player.PlayerRepository;
 import com.fantasyhnl.team.TeamRepository;
 import com.fantasyhnl.util.BaseRepository;
@@ -12,7 +13,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.fantasyhnl.util.Constants.*;
 
@@ -40,7 +40,8 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
 
             var savedFixture = baseRepository.save(fixture);
             if (savedFixture.getId() < 1034786) {
-                addStatistic(savedFixture);
+//                addStatistic(savedFixture);
+                addEventStatistic(savedFixture);
             }
         }
     }
@@ -56,6 +57,7 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
                     for (var res : response) {
                         fixture.updateFixture(res);
                         setFixtureEvents(res, fixture);
+                        updatePlayerStatistic(res, fixture);
                     }
                 });
     }
@@ -71,7 +73,7 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
                     for (var res : response) {
                         fixture.updateFixture(res);
                         setFixtureEvents(res, fixture);
-//            setPlayerStatistic(res, fix);
+                        updatePlayerStatistic(res, fixture);
                     }
                 }, () -> {
                     throw new InvalidIdException("");
@@ -156,6 +158,27 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
                     stat.setFixture(fixture);
                     stat.setPlayer(player);
                     player.addStatistic(stat);
+                }
+            }
+        }
+    }
+
+    private void updatePlayerStatistic(FixtureResponse res, Fixture fixture) {
+        var statisticResponses = res.getPlayers();
+        if (statisticResponses == null) return;
+        for (var statResponse : statisticResponses) {
+            var statPlayerResponses = statResponse.getPlayers();
+            for (var statPlayerResponse : statPlayerResponses) {
+                var play = statPlayerResponse.getPlayer();
+                var savedPlayerOpt = playerRepository.findById(play.getId());
+                if (savedPlayerOpt.isEmpty()) continue;
+                var player = savedPlayerOpt.get();
+                var savedStats = player.getStatistics();
+                var statistics = statPlayerResponse.getStatistics();
+                for (var stat : statistics) {
+                    for (var savedStat : savedStats) {
+                        savedStat.setStatistic(stat);
+                    }
                 }
             }
         }
