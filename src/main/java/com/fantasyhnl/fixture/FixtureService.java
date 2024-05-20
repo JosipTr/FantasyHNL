@@ -39,10 +39,7 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
             setFixtureTeams(res);
 
             var savedFixture = baseRepository.save(fixture);
-            if (savedFixture.getId() < 1034786) {
-//                addStatistic(savedFixture);
-                addEventStatistic(savedFixture);
-            }
+            addEventStatistic(savedFixture);
         }
     }
 
@@ -50,7 +47,6 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
     @Transactional
     public void update() {
         baseRepository.findAll().stream()
-                .filter(fix -> fix.getId() < 1034786)
                 .toList().forEach(fixture -> {
                     var response = getFixtureResponse(fixture);
                     fixture.removeEvents();
@@ -190,7 +186,6 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
             setFixtureEvents(res, fixture);
         }
     }
-
     private void addEventStatistic(Fixture fixture) {
         var response = getFixtureResponse(fixture);
         for (var res : response) {
