@@ -32,10 +32,7 @@ public class Fixture {
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "fixture")
     private Goals goals;
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "fixture", fetch = FetchType.LAZY)
-    @BatchSize(size = 10)
     private Set<Event> events = new HashSet<>();
-//    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "fixture", fetch = FetchType.EAGER)
-//    private Set<Statistic> statistics = new HashSet<>();
 
     public void setFixture(FixtureResponse response) {
         var status = response.getFixture().getStatus();

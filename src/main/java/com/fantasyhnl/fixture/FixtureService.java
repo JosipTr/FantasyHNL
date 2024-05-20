@@ -7,6 +7,7 @@ import com.fantasyhnl.util.BaseRepository;
 import com.fantasyhnl.util.BaseService;
 import com.fantasyhnl.util.JsonToObjectMapper;
 import com.fantasyhnl.util.RestService;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -19,11 +20,13 @@ import static com.fantasyhnl.util.Constants.*;
 public class FixtureService extends BaseService<Fixture, FixtureDto> {
     private final TeamRepository teamRepository;
     private final PlayerRepository playerRepository;
+    private final EntityManager entityManager;
 
-    protected FixtureService(RestService restService, JsonToObjectMapper objectMapper, ModelMapper modelMapper, BaseRepository<Fixture> baseRepository, TeamRepository teamRepository, PlayerRepository playerRepository) {
+    protected FixtureService(RestService restService, JsonToObjectMapper objectMapper, ModelMapper modelMapper, BaseRepository<Fixture> baseRepository, TeamRepository teamRepository, PlayerRepository playerRepository, EntityManager entityManager) {
         super(restService, objectMapper, modelMapper, baseRepository);
         this.teamRepository = teamRepository;
         this.playerRepository = playerRepository;
+        this.entityManager = entityManager;
     }
 
     @Override
@@ -51,6 +54,7 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
                         fixture.updateFixture(res);
                         setFixtureEvents(res, fixture);
                         updatePlayerStatistic(res, fixture);
+                        entityManager.flush();
                     }
                 });
     }
@@ -186,6 +190,7 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
     }
 
     private List<FixtureResponse> getFixtureResponse(Fixture fixture) {
+
         var url = fixtureDetailPath + fixture.getId() + ".json";
         return getRootResponse(url, FixtureResponse.class);
     }
