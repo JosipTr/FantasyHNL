@@ -27,9 +27,7 @@ public class PlayerService extends BaseService<Player, PlayerDto> {
         var teams = teamRepository.findAll();
         for (var team : teams) {
             var url = basicPlayerPath + team.getId() + ".json";
-            var body = readFromFile(url);
-            var root = objectMapper.mapToRootObject(body, BasicPlayerResponse.class);
-            var response = root.getResponse();
+            var response = getRootResponse(url, BasicPlayerResponse.class);
             for (var res : response) {
                 var players = res.getPlayers();
                 for (var player : players) {
@@ -43,9 +41,7 @@ public class PlayerService extends BaseService<Player, PlayerDto> {
         for (var player : players) {
             for (var i = 1; i <= 28; i++) {
                 var url = playerPath + i + ".json";
-                var body = readFromFile(url);
-                var root = objectMapper.mapToRootObject(body, PlayerResponse.class);
-                var response = root.getResponse();
+                var response = getRootResponse(url, PlayerResponse.class);
                 for (var res : response) {
                     if (player.getId() == res.getPlayer().getId()) {
                         player.updatePlayer(res.getPlayer());

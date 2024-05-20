@@ -1,7 +1,6 @@
 package com.fantasyhnl.fixture;
 
 import com.fantasyhnl.exception.InvalidIdException;
-import com.fantasyhnl.fixture.statistic.StatisticId;
 import com.fantasyhnl.player.PlayerRepository;
 import com.fantasyhnl.team.TeamRepository;
 import com.fantasyhnl.util.BaseRepository;
@@ -29,9 +28,7 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
 
     @Override
     public void add() {
-        var body = readFromFile(fixturePath);
-        var root = objectMapper.mapToRootObject(body, FixtureResponse.class);
-        var response = root.getResponse();
+        var response = getRootResponse(fixturePath, FixtureResponse.class);
         for (var res : response) {
             var fixture = res.getFixture();
 
@@ -180,12 +177,6 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
         }
     }
 
-    private void addStatistic(Fixture fixture) {
-        var response = getFixtureResponse(fixture);
-        for (var res : response) {
-            setFixtureEvents(res, fixture);
-        }
-    }
     private void addEventStatistic(Fixture fixture) {
         var response = getFixtureResponse(fixture);
         for (var res : response) {
@@ -196,9 +187,7 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
 
     private List<FixtureResponse> getFixtureResponse(Fixture fixture) {
         var url = fixtureDetailPath + fixture.getId() + ".json";
-        var body = readFromFile(url);
-        var root = objectMapper.mapToRootObject(body, FixtureResponse.class);
-        return root.getResponse();
+        return getRootResponse(url, FixtureResponse.class);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.fantasyhnl.util;
 
 import com.fantasyhnl.exception.EmptyListException;
 import com.fantasyhnl.exception.InvalidIdException;
+import com.fantasyhnl.fixture.FixtureResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -46,12 +47,11 @@ public abstract class BaseService<T, D> {
         baseRepository.deleteAll();
     }
 
-    public abstract void add();
+    protected void updateById(int id) {}
 
-    public abstract void update();
-
-    protected void updateById(int id) {
-
+    protected <S> List<S> getRootResponse(String url, Class<S> type) {
+        var body = readFromFile(url);
+        return objectMapper.mapToRootObject(body, type).getResponse();
     }
 
     protected void waitSeconds(int seconds) {
@@ -81,6 +81,10 @@ public abstract class BaseService<T, D> {
     protected D convertToDto(T entity) {
         return modelMapper.map(entity, getDtoClass());
     }
+
+    public abstract void add();
+
+    public abstract void update();
 
     protected abstract Class<D> getDtoClass();
 }

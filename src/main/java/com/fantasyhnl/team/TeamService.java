@@ -15,16 +15,15 @@ public class TeamService extends BaseService<Team, TeamDto> {
 
     @Override
     public void add() {
-        String body = readFromFile(teamFilePath);
-        var root = objectMapper.mapToRootObject(body, TeamResponse.class);
-        var response = root.getResponse();
-        for (var res : response) {
-            baseRepository.save(res.getTeam());
-        }
+        var response = getRootResponse(teamFilePath, TeamResponse.class);
+        response.forEach(teamResponse -> {
+            baseRepository.save(teamResponse.getTeam());
+        });
     }
 
     @Override
-    public void update() {}
+    public void update() {
+    }
 
     @Override
     protected Class<TeamDto> getDtoClass() {
