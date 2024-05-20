@@ -20,13 +20,11 @@ import static com.fantasyhnl.util.Constants.*;
 public class FixtureService extends BaseService<Fixture, FixtureDto> {
     private final TeamRepository teamRepository;
     private final PlayerRepository playerRepository;
-    private final EntityManager entityManager;
 
-    protected FixtureService(RestService restService, JsonToObjectMapper objectMapper, ModelMapper modelMapper, BaseRepository<Fixture> baseRepository, TeamRepository teamRepository, PlayerRepository playerRepository, EntityManager entityManager) {
+    protected FixtureService(RestService restService, JsonToObjectMapper objectMapper, ModelMapper modelMapper, BaseRepository<Fixture> baseRepository, TeamRepository teamRepository, PlayerRepository playerRepository) {
         super(restService, objectMapper, modelMapper, baseRepository);
         this.teamRepository = teamRepository;
         this.playerRepository = playerRepository;
-        this.entityManager = entityManager;
     }
 
     @Override
@@ -54,7 +52,6 @@ public class FixtureService extends BaseService<Fixture, FixtureDto> {
                         fixture.updateFixture(res);
                         setFixtureEvents(res, fixture);
                         updatePlayerStatistic(res, fixture);
-                        entityManager.flush();
                     }
                 });
     }
