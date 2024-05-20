@@ -9,6 +9,8 @@ import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static com.fantasyhnl.util.Constants.*;
 
 @Service
@@ -28,31 +30,39 @@ public class PlayerService extends BaseService<Player, PlayerDto> {
         for (var team : teams) {
             var url = basicPlayerPath + team.getId() + ".json";
             var response = getRootResponse(url, BasicPlayerResponse.class);
-            for (var res : response) {
-                var players = res.getPlayers();
-                for (var player : players) {
+            response.forEach(res -> {
+                res.getPlayers().forEach(player -> {
                     player.setTeam(team);
                     team.addPlayer(player);
                     baseRepository.save(player);
-                }
-            }
+                });
+            });
         }
-        var players = baseRepository.findAll();
-        for (var player : players) {
-            for (var i = 1; i <= 28; i++) {
-                var url = playerPath + i + ".json";
-                var response = getRootResponse(url, PlayerResponse.class);
-                for (var res : response) {
-                    if (player.getId() == res.getPlayer().getId()) {
-                        player.updatePlayer(res.getPlayer());
-                    }
-                }
-            }
+        updatePlayerInfo(1, 0);
+    }
+
+    private void updatePlayerInfo(int current, int total) {
+        System.out.println(current);
+        var url = playerPath + current + ".json";
+        var root = getRoot(url, PlayerResponse.class);
+        var response = root.getResponse();
+        total = root.getPaging().getTotal();
+        current = root.getPaging().getCurrent() + 1;
+        for (var res : response) {
+            var player = res.getPlayer();
+            baseRepository.findById(player.getId()).ifPresent(savedPlayer -> {
+                savedPlayer.setFirstname(player.getFirstname());
+                savedPlayer.setLastname(player.getLastname());
+                savedPlayer.setInjured(player.getInjured());
+            });
         }
+        if (current > total) return;
+        updatePlayerInfo(current, total);
     }
 
     @Override
-    public void update() {}
+    public void update() {
+    }
 
     @Override
     protected Class<PlayerDto> getDtoClass() {

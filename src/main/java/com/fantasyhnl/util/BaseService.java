@@ -49,6 +49,11 @@ public abstract class BaseService<T, D> {
 
     protected void updateById(int id) {}
 
+    protected <S> Root<S> getRoot(String url, Class<S> type) {
+        var body = readFromFile(url);
+        return objectMapper.mapToRootObject(body, type);
+    }
+
     protected <S> List<S> getRootResponse(String url, Class<S> type) {
         var body = readFromFile(url);
         return objectMapper.mapToRootObject(body, type).getResponse();
