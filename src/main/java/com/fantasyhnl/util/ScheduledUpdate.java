@@ -20,12 +20,9 @@ public class ScheduledUpdate {
         this.fixtureService = fixtureService;
     }
 
-//    @Scheduled(cron = "*/10 * * * * *")
+    @Scheduled(cron = "* * 2 * * *")
     public void updateAll() {
-        System.out.println("no");
         teamService.add();
-        playerService.add();
         fixtureService.update();
-        System.out.println("yes");
     }
 }
