@@ -1,7 +1,7 @@
 package com.fantasyhnl.config;
 
-import com.fantasyhnl.fixture.*;
-import com.fantasyhnl.util.BaseController;
+import com.fantasyhnl.FixtureWebSocket.MyWebSocketHandler;
+import com.fantasyhnl.FixtureWebSocket.WebSocketService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.WebSocketHandler;

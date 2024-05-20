@@ -1,7 +1,7 @@
-package com.fantasyhnl.fixture;
+package com.fantasyhnl.FixtureWebSocket;
 
+import com.fantasyhnl.fixture.FixtureDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fantasyhnl.util.BaseController;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
