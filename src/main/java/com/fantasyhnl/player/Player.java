@@ -27,7 +27,7 @@ public class Player {
     private String photo;
     @ManyToOne
     private Team team;
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "player")
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "player")
     private Set<Statistic> statistics = new HashSet<>();
 
     public void addStatistic(Statistic statistic) {

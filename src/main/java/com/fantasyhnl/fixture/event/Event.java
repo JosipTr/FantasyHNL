@@ -18,13 +18,13 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @JsonIgnore
     private int id;
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @ManyToOne(cascade = {CascadeType.PERSIST})
     private Time time;
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(cascade = {})
     private Team team;
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(cascade = {})
     private Player player;
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(cascade = {})
     private Player assist;
     private String type;
     private String detail;
