@@ -36,7 +36,6 @@ public abstract class BaseService<T, D> {
         throw new InvalidIdException("Invalid ID");
     }
 
-    @Cacheable("fixtures")
     protected List<D> getAll() {
         var results = baseRepository.findAll();
         if (results.isEmpty()) throw new EmptyListException(emptyList);
