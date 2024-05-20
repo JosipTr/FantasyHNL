@@ -2,10 +2,7 @@ package com.fantasyhnl.fixture.goals;
 
 import com.fantasyhnl.fixture.Fixture;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -14,6 +11,7 @@ import lombok.ToString;
 @Data
 @ToString(exclude = "fixture")
 @EqualsAndHashCode(exclude = "fixture")
+@Table(name = "fixture_goals")
 public class Goals {
     @Id
     @JsonIgnore

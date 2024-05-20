@@ -31,7 +31,7 @@ public class Fixture {
     private Teams teams;
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "fixture")
     private Goals goals;
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "fixture", fetch = FetchType.LAZY)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "fixture")
     private Set<Event> events = new HashSet<>();
 
     public void setFixture(FixtureResponse response) {
@@ -63,10 +63,6 @@ public class Fixture {
     public void addEvent(Event event) {
         this.events.add(event);
     }
-
-//    public void addStatistic(Statistic statistic) {
-//        this.statistics.add(statistic);
-//    }
 
     public void removeEvents() {
         Set<Event> tmp = new HashSet<>(this.events);

@@ -27,14 +27,8 @@ public class Player {
     private String photo;
     @ManyToOne
     private Team team;
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "player", fetch = FetchType.LAZY)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "player")
     private Set<Statistic> statistics = new HashSet<>();
-
-    public void updatePlayer(Player player) {
-        this.setFirstname(player.getFirstname());
-        this.setLastname(player.getLastname());
-        this.setInjured(player.getInjured());
-    }
 
     public void addStatistic(Statistic statistic) {
         this.statistics.add(statistic);

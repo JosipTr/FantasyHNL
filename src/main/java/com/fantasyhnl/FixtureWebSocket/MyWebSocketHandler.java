@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
@@ -15,6 +16,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 @Component
+@EnableScheduling
 public class MyWebSocketHandler implements WebSocketHandler {
 
     private final WebSocketService service;
@@ -24,15 +26,20 @@ public class MyWebSocketHandler implements WebSocketHandler {
     private final List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
 
     public MyWebSocketHandler(WebSocketService service) {
-
         this.service = service;
     }
 
-    @Scheduled(fixedRate = 5000)
+//    @Scheduled(fixedRate = 5000)
     private void sendDataToClients() {
         if (sessions.isEmpty()) return;
-        checkDate();
-        sendFixtureToClients(filterFixtures());
+        try {
+            var fixtures = checkDate();
+            if (!fixtures.isEmpty()) {
+                sendFixtureToClients(fixtures);
+            }
+        } catch (Exception e) {
+            logger.error("Error sending data to clients: {}", e.getMessage());
+        }
     }
 
     private void sendFixtureToClients(List<FixtureDto> fixtures) {
@@ -68,30 +75,36 @@ public class MyWebSocketHandler implements WebSocketHandler {
                 .collect(Collectors.toList());
     }
 
-    private void checkDate() {
+    private List<FixtureDto> checkDate() {
         var fixtures = filterFixtures();
-        var currentTimestamp = (int) Instant.now().getEpochSecond();
+        var currentTimestamp = Instant.now().getEpochSecond();
+
+        List<FixtureDto> updatedFixtures = new ArrayList<>();
 
         for (var fixture : fixtures) {
-            var fixtureTimestamp = (int) fixture.getTimestamp();
+            var fixtureTimestamp = fixture.getTimestamp();
             var halfTimestamp = fixtureTimestamp + (46 * 60);
             var pauseTimestamp = halfTimestamp + (16 * 60);
             var fullTimestamp = halfTimestamp + (46 * 60);
+
             if (currentTimestamp >= halfTimestamp && currentTimestamp <= pauseTimestamp) continue;
 
             if ((currentTimestamp >= fixtureTimestamp && currentTimestamp <= halfTimestamp) ||
                     (currentTimestamp >= halfTimestamp && currentTimestamp <= fullTimestamp)) {
                 service.updateById(fixture.getId());
+                updatedFixtures.add(fixture);
                 logger.info("Fixture with ID {} updated", fixture.getId());
             }
         }
+        return updatedFixtures;
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         logger.info("WebSocket connection established");
         sessions.add(session);
-        sendFixtureToClients(filterFixtures());
+        var fixtures = filterFixtures();
+        sendFixtureToClients(fixtures);
         session.sendMessage(new TextMessage("Hello, client! Welcome to the WebSocket server."));
     }
 
@@ -104,6 +117,7 @@ public class MyWebSocketHandler implements WebSocketHandler {
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
         logger.error("WebSocket transport error: {}", exception.getMessage());
+        sessions.remove(session);
     }
 
     @Override
