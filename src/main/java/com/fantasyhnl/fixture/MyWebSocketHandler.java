@@ -17,34 +17,27 @@ import java.util.stream.Collectors;
 @Component
 public class MyWebSocketHandler implements WebSocketHandler {
 
-    private final BaseController<Fixture, FixtureDto> controller;
+    private final WebSocketService service;
     private static final Logger logger = LoggerFactory.getLogger(MyWebSocketHandler.class);
 
     private final ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
     private final List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
 
-    public MyWebSocketHandler(BaseController<Fixture, FixtureDto> controller) {
-        this.controller = controller;
+    public MyWebSocketHandler(WebSocketService service) {
+
+        this.service = service;
     }
 
     @Scheduled(fixedRate = 5000)
     private void sendDataToClients() {
-        for (WebSocketSession session : sessions) {
-            try {
-                var fixtures = filterFixtures();
-                checkDate(fixtures);
-                var jsonData = ow.writeValueAsString(fixtures);
-                session.sendMessage(new TextMessage(jsonData));
-            } catch (Exception e) {
-                logger.error("Error sending data to client: {}", e.getMessage());
-            }
-        }
+        if (sessions.isEmpty()) return;
+        checkDate();
+        sendFixtureToClients(filterFixtures());
     }
 
-    private void sendFixtureToClients() {
+    private void sendFixtureToClients(List<FixtureDto> fixtures) {
         for (WebSocketSession session : sessions) {
             try {
-                var fixtures = filterFixtures();
                 var jsonData = ow.writeValueAsString(fixtures);
                 session.sendMessage(new TextMessage(jsonData));
             } catch (Exception e) {
@@ -53,23 +46,9 @@ public class MyWebSocketHandler implements WebSocketHandler {
         }
     }
 
-    private void updateFixture(int id) {
-        try {
-            controller.updateById(id);
-            logger.info("Updated fixture with ID: {}", id);
-        } catch (Exception e) {
-            logger.error("Error updating fixture with ID {}: {}", id, e.getMessage());
-        }
-    }
-
-    private List<FixtureDto> fetchFixtures() {
-        var responseEntity = controller.getAll();
-        return responseEntity.getBody();
-    }
-
     private List<FixtureDto> filterFixtures() {
         var myLocalDate = LocalDate.now(ZoneId.of("Europe/Zagreb"));
-        var fixtures = fetchFixtures().stream()
+        var fixtures = service.getAll().stream()
                 .sorted(Comparator.comparing(FixtureDto::getTimestamp))
                 .toList();
 
@@ -89,7 +68,8 @@ public class MyWebSocketHandler implements WebSocketHandler {
                 .collect(Collectors.toList());
     }
 
-    private void checkDate(List<FixtureDto> fixtures) {
+    private void checkDate() {
+        var fixtures = filterFixtures();
         var currentTimestamp = (int) Instant.now().getEpochSecond();
 
         for (var fixture : fixtures) {
@@ -97,12 +77,12 @@ public class MyWebSocketHandler implements WebSocketHandler {
             var halfTimestamp = fixtureTimestamp + (46 * 60);
             var pauseTimestamp = halfTimestamp + (16 * 60);
             var fullTimestamp = halfTimestamp + (46 * 60);
-
             if (currentTimestamp >= halfTimestamp && currentTimestamp <= pauseTimestamp) continue;
 
             if ((currentTimestamp >= fixtureTimestamp && currentTimestamp <= halfTimestamp) ||
                     (currentTimestamp >= halfTimestamp && currentTimestamp <= fullTimestamp)) {
-                updateFixture(fixture.getId());
+                service.updateById(fixture.getId());
+                logger.info("Fixture with ID {} updated", fixture.getId());
             }
         }
     }
@@ -111,7 +91,7 @@ public class MyWebSocketHandler implements WebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         logger.info("WebSocket connection established");
         sessions.add(session);
-        sendFixtureToClients();
+        sendFixtureToClients(filterFixtures());
         session.sendMessage(new TextMessage("Hello, client! Welcome to the WebSocket server."));
     }
 

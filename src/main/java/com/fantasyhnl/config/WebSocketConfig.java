@@ -1,9 +1,6 @@
 package com.fantasyhnl.config;
 
-import com.fantasyhnl.fixture.Fixture;
-import com.fantasyhnl.fixture.FixtureDto;
-import com.fantasyhnl.fixture.FixtureService;
-import com.fantasyhnl.fixture.MyWebSocketHandler;
+import com.fantasyhnl.fixture.*;
 import com.fantasyhnl.util.BaseController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,10 +12,10 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @Configuration
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
-    private final BaseController<Fixture, FixtureDto> baseController;
+    private final WebSocketService service;
 
-    public WebSocketConfig(BaseController<Fixture, FixtureDto> baseController) {
-        this.baseController = baseController;
+    public WebSocketConfig(WebSocketService service) {
+        this.service = service;
     }
 
     @Override
@@ -28,7 +25,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Bean
     public WebSocketHandler webSocketHandler() {
-        return new MyWebSocketHandler(baseController);
+        return new MyWebSocketHandler(service);
     }
 }
 
